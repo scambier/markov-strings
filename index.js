@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('lodash');
-var S = require('string');
 
 class Generator {
   constructor(data, options) {
