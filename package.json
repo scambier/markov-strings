@@ -1,0 +1,34 @@
+{
+  "name": "markov-strings",
+  "version": "0.0.1",
+  "description": "some desc",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scambier/markov-strings"
+  },
+  "keywords": [
+    "markov",
+    "string",
+    "chain",
+    "procedural",
+    "generation",
+    "text"
+  ],
+  "author": "scambier",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
+  },
+  "dependencies": {
+    "lodash": "^4.13.1",
+    "string": "^3.3.1"
+  }
+}
