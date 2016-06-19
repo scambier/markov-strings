@@ -30,7 +30,6 @@ class Generator {
     let options = this.options;
 
     this.data.forEach(line => {
-      line = S(line).strip('"');
       let words = line.split(' ');
 
       // Start words
