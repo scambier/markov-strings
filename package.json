@@ -4,7 +4,8 @@
   "description": "A Markov string generator",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec"
+    "test": "node node_modules/mocha/bin/_mocha --reporter spec",
+    "cover": "node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
   },
   "engines": {
     "node": ">=4.0.0"
@@ -25,6 +26,8 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^3.5.0",
+    "coveralls": "^2.11.9",
+    "istanbul": "^0.4.3",
     "mocha": "^2.5.3"
   },
   "dependencies": {
