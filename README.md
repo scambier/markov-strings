@@ -13,12 +13,12 @@ Give it an array of strings, and it will output a randomly generated string.
 This module makes use of ES6 features.
 
 ###Installing
-`npm install --save markov-chains`
+`npm install --save markov-strings`
 
 ###Basic usage
 
 ```javascript
-let Markdown = require('markov-strings');
+let Markov = require('markov-strings');
 
 let data = [];    // An array of strings
 let options = {}; // An optional object of options
