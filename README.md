@@ -26,7 +26,7 @@ let options = {}; // An optional object of options
 let generator = new Markov(data, options);
 
 let refinedOptions = {}; // An optional object of options, for this particular generation
-generator.generateSentence(refinedOptions);  // Outputs an a object, containing a string and a score
+generator.generateSentence(refinedOptions);  // Outputs an object, containing a string and a score
 ```
 
 ###Options
