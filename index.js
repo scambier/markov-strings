@@ -119,19 +119,6 @@ class Generator {
 
     throw new Error('Cannot build sentence with current corpus and options');
   }
-
-  _parseOption(options, name) {
-    return options[name] ? options[name] : this.defaultOptions[name];
-  }
-
-  parseOptions(options) {
-    options.stateSize = this._parseOption(options, 'stateSize');
-    options.maxLength = this._parseOption(options, 'maxLength');
-    options.minWords = this._parseOption(options, 'minWords');
-    options.minScore = this._parseOption(options, 'minScore');
-    return options;
-  }
-
 }
 
 module.exports = Generator;
