@@ -8,28 +8,63 @@ A simplistic Markov chain text generator.
 
 Give it an array of strings, and it will output a randomly generated string.
 
-##Getting started
-
-###Prerequisites
+##Prerequisites
 This module makes use of ES6 features.
 
-###Installing
+##Installing
 `npm install --save markov-strings`
 
-###Basic usage
+##Usage
 
 ```javascript
 let Markov = require('markov-strings');
 
-let data = [];    // An array of strings
-let options = {}; // An optional object of options
-let generator = new Markov(data, options);
+// An array of strings
+let data = [/* insert a few hundreds sentences here */];
 
-let refinedOptions = {}; // An optional object of options, for this particular generation
-generator.generateSentence(refinedOptions);  // Outputs an object, containing a string and a score
+// Some options to generate Twitter-ready strings
+let options = {
+  maxLength: 140,
+  minWords: 10,
+  minScore: 25,
+};
+
+// Instantiate the generator
+let markov = new Markov(data, options);
+
+// Generate some tweets
+let tweets = [];
+for (let i = 0; i < 10; i++) {
+  tweets.push(markov.generateSentence());
+}
+
+// Generate a shorter tweet to add a link
+let shorterTweet = markov.generateSentence({
+  maxLength: 140-24
+});
+shorterTweet += ' https://github.com/scambier/markov-strings'; // Links always take 23 characters in a tweet
+
+console.log(shorterTweet);
+/*
+Possible output: 
+{
+  string: 'lorem ipsum dolor sit amet (etc.) https://github.com/scambier/markov-strings',
+  score: 42
+}
+*/
+
 ```
+## API
+### Markov(data, [options])
+Create a generator instance.
+#### data
+Type: `array`
 
-###Options
+`data` is an array of strings (sentences). The bigger the array, the better and more various the results.
+
+#### options
+Type: `object`
+
 You can provide options during the generator instantiation, and/or while calling `generateSentence()`.
 
 The `options` object will alter the quality, length, etc. of the generated sentences. 
@@ -37,7 +72,7 @@ The `options` object will alter the quality, length, etc. of the generated sente
 Options given to `generateSentence()` overwrite those given during instantiation.
 It can be useful if you wish to generate multiple sentences with slight variations each time.
 
-#####stateSize
+##### stateSize
 Type: `integer`  
 Default: `2`
 
@@ -46,31 +81,42 @@ The number of words for each state.
 `2` is a sensible default.  
 `3` and more could create good sentences, at the expense of randomness. You'll need a good corpus, though.
 
-#####maxLength
+##### maxLength
 Type: `integer`  
 Default: `0`
 
 Maximum characters.
 
-#####minWords
+##### minWords
 Type: `integer`  
 Default: `5`
 
 Minimum number of words.
 
-#####maxWords
+##### maxWords
 Type: `integer`  
 Default: `0`
 
 Maximum number of words.
 
-#####minScore
+##### minScore
 Type: `integer`  
 Default: `0`
 
 Each generated sentence will be associated to a score. The highest this score, the more random the sentence should be.
 
 A good `minScore` value totally depends of your corpus, and the number of words of the sentence, so you'll have to try yourself.
+
+#### markov.generateSentence([options])
+Generate a random sentence.
+
+##### options
+Type: `object`
+
+If set, these options will take precedence over those set in the constructor.
+
+## Todo
+The generator should return a Promise, to not hang the thread.
 
 ## Running the tests
 `npm test`
