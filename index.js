@@ -20,7 +20,7 @@ class Generator {
     // Save options
     options = options ? options : {};
     this.options = this.defaultOptions;
-    _.extend(this.options, options);
+    _.assignIn(this.options, options);
 
     this.buildCorpus();
   }
@@ -66,10 +66,11 @@ class Generator {
 
   generateSentence(options, check) {
     options = options ? options : {};
-    _.assignIn(options, this.options);
+    _.assignIn(this.options, options);
+    options = this.options;
 
     let corpus = _.cloneDeep(this.corpus);
-    let max = 10000, iter = 0;
+    const max = 10000;
 
     // Loop for maximum tries
     for (let i = 0; i < max; i++) {
