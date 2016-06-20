@@ -11,7 +11,8 @@ var data = [
   "Quisque tempor, erat vel lacinia imperdiet",
   "Justo nisi fringilla dui",
   "Egestas bibendum eros nisi ut lacus",
-  "Sony avait annoncé une rupture avec le Xperia X: il n'en est rien…"
+  "fringilla dui avait annoncé une rupture avec le erat vel: il n'en est rien…",
+  "Fusce tincidunt tempor, erat vel lacinia vel ex pharetra pretium lacinia imperdiet"
 ];
 
 describe('Options parser', function() {
@@ -39,7 +40,7 @@ describe('Generator builder', function() {
     });
 
     it('should have the right length', function() {
-      expect(generator.startWords).to.have.lengthOf(6);
+      expect(generator.startWords).to.have.lengthOf(7);
     });
   });
 
@@ -101,6 +102,42 @@ describe('Sentence generator', function() {
     for (let i = 0; i < 10; i++) {
       expect(generator.endWords).to.contain(end.join(' '));
     }
+  });
+
+  it('should reject all sentences', function() {
+    let options = {minWords:5};
+    for (let i = 0; i < 10; i++) {
+      expect(() => {
+        generator.generateSentence(options, result => result.split(' ').length < 5)
+      }).to.throw(Error);
+    }
+  });
+
+  it('should accept all sentences', function() {
+    for (let i = 0; i < 10; i++) {
+      expect(() => {
+        generator.generateSentence({}, result => true)
+      }).to.exist;
+    }
+  });
+
+  it('should reject if the options values are not met', function() {
+    expect(() => {
+      generator.generateSentence({maxLength:1, minWords:0, maxWords:0})
+    }).to.throw(Error);
+
+    expect(() => {
+      generator.generateSentence({minWords:100})
+    }).to.throw(Error);
+
+    expect(() => {
+      generator.generateSentence({minScore: 20})
+    }).to.throw(Error);
+
+    expect(() => {
+      generator.generateSentence({maxWords: 1, minWords:0})
+    }).to.throw(Error);
+
   });
 
 });
