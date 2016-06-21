@@ -104,40 +104,41 @@ describe('Sentence generator', function() {
     }
   });
 
-  it('should reject all sentences', function() {
-    let options = {minWords:5};
-    for (let i = 0; i < 10; i++) {
-      expect(() => {
-        generator.generateSentence(options, result => result.split(' ').length < 5)
-      }).to.throw(Error);
-    }
+  it('should reject the sentence', function() {
+    let options = {minWords: 5, maxTries: 10};
+    expect(() => {
+      generator.generateSentence(options, result => result.split(' ').length < 5)
+    }).to.throw(Error);
   });
 
-  it('should accept all sentences', function() {
-    for (let i = 0; i < 10; i++) {
-      expect(() => {
-        generator.generateSentence({}, result => true)
-      }).to.exist;
-    }
+  it('should accept the sentence', function() {
+    expect(() => {
+      generator.generateSentence({}, result => true)
+    }).to.exist;
   });
 
-  it('should reject if the options values are not met', function() {
+  it('should reject because maxLength is unattainable', function() {
     expect(() => {
-      generator.generateSentence({maxLength:1, minWords:0, maxWords:0})
+      generator.generateSentence({maxTries: 10, maxLength: 1, minWords: 0, maxWords: 0})
     }).to.throw(Error);
+  });
 
+  it('should reject because minWords is unattainable', function() {
     expect(() => {
-      generator.generateSentence({minWords:100})
+      generator.generateSentence({maxTries: 10, minWords: 100})
     }).to.throw(Error);
+  });
 
+  it('should reject because minScore is unattainable', function() {
     expect(() => {
-      generator.generateSentence({minScore: 20})
+      generator.generateSentence({maxTries: 10, minScore: 20})
     }).to.throw(Error);
+  });
 
+  it('should reject because maxWords is unattainable', function() {
     expect(() => {
-      generator.generateSentence({maxWords: 1, minWords:0})
+      generator.generateSentence({maxTries: 10, maxWords: 1, minWords: 0})
     }).to.throw(Error);
-
   });
 
 });
