@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('lodash');
+const _ = require('lodash');
 
 class Generator {
   constructor(data, options) {
@@ -22,32 +22,41 @@ class Generator {
     options = options ? options : {};
     this.options = this.defaultOptions;
     _.assignIn(this.options, options);
-
-    this.buildCorpus();
+  }
+  
+  buildCorpus() {
+    return new Promise((resolve, reject) => {
+      try {
+        resolve(this.buildCorpusSync());
+      }
+      catch(e) {
+        reject(e);
+      }
+    });
   }
 
-  buildCorpus() {
-    let options = this.options;
+  buildCorpusSync() {
+    const options = this.options;
 
     this.data.forEach(line => {
-      let words = line.split(' ');
+      const words = line.split(' ');
 
       // Start words
-      let start = _.slice(words, 0, options.stateSize).join(' ');
+      const start = _.slice(words, 0, options.stateSize).join(' ');
       if (!_.includes(this.startWords, start)) {
         this.startWords.push(start);
       }
 
       // End words
-      var end = _.slice(words, words.length - options.stateSize, words.length).join(' ');
+      const end = _.slice(words, words.length - options.stateSize, words.length).join(' ');
       if (!_.includes(this.endWords, end)) {
         this.endWords.push(end);
       }
 
       // Build corpus
-      for (var i = 0; i < words.length - 1; i++) {
-        var curr = _.slice(words, i, i + options.stateSize).join(' ');
-        var next = _.slice(words, i + options.stateSize, i + options.stateSize * 2).join(' ');
+      for (let i = 0; i < words.length - 1; i++) {
+        const curr = _.slice(words, i, i + options.stateSize).join(' ');
+        const next = _.slice(words, i + options.stateSize, i + options.stateSize * 2).join(' ');
         if (!next || next.split(' ').length != options.stateSize) {
           continue;
         }
@@ -66,23 +75,34 @@ class Generator {
   }
 
   generateSentence(options, check) {
+    return new Promise((resolve, reject) => {
+      try {
+        resolve(this.generateSentenceSync(options, check))
+      }
+      catch(e) {
+        reject(e);
+      }
+    });
+  }
+
+  generateSentenceSync(options, check) {
     options = options ? options : {};
     _.assignIn(this.options, options);
     options = this.options;
 
-    let corpus = _.cloneDeep(this.corpus);
+    const corpus = _.cloneDeep(this.corpus);
     const max = options.maxTries;
 
     // Loop for maximum tries
     for (let i = 0; i < max; i++) {
       let ended = false;
-      let arr = [_.sample(this.startWords)];
+      const arr = [_.sample(this.startWords)];
       let score = 0;
 
       // Loop to build sentence
       while (true) {
-        let key = arr[arr.length - 1]; // Last value in array
-        let state = _.sample(corpus[key]);
+        const key = arr[arr.length - 1]; // Last value in array
+        const state = _.sample(corpus[key]);
 
         // Sentence cannot be finished
         if (!state) {
