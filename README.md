@@ -17,41 +17,51 @@ This module makes use of ES6 features.
 ##Usage
 
 ```javascript
-let Markov = require('markov-strings');
+const Markov = require('markov-strings');
 
 // An array of strings
-let data = [/* insert a few hundreds sentences here */];
+const data = [/* insert a few hundreds/thousands sentences here */];
 
 // Some options to generate Twitter-ready strings
-let options = {
+const options = {
   maxLength: 140,
   minWords: 10,
   minScore: 25,
 };
 
 // Instantiate the generator
-let markov = new Markov(data, options);
+const markov = new Markov(data, options);
 
-// Generate some tweets
-let tweets = [];
-for (let i = 0; i < 10; i++) {
-  tweets.push(markov.generateSentence());
-}
+// Build the corpus
+markov.buildCorpus()
+  .then(() => {
+    // Generate some tweets
+    const tweets = [];
+    for (let i = 0; i < 10; i++) {
+      markov.generateSentence()
+        .then(result => {
+          tweets.push(result);
+        });
+    }
 
-// Generate a shorter tweet to add a link
-let shorterTweet = markov.generateSentence({
-  maxLength: 140-24
-});
-shorterTweet += ' https://github.com/scambier/markov-strings'; // Links always take 23 characters in a tweet
+    // Generate a shorter tweet to add a link
+    markov.generateSentence({
+        maxLength: 140 - 24
+      })
+      .then(shorterTweet => {
+        shorterTweet += ' https://github.com/scambier/markov-strings'; // Links always take 23 characters in a tweet
 
-console.log(shorterTweet);
-/*
-Possible output: 
-{
-  string: 'lorem ipsum dolor sit amet (etc.) https://github.com/scambier/markov-strings',
-  score: 42
-}
-*/
+        console.log(shorterTweet);
+        /*
+         Possible output: 
+         {
+           string: 'lorem ipsum dolor sit amet (etc.) https://github.com/scambier/markov-strings',
+           score: 42
+         }
+         */
+      })
+  });
+
 
 ```
 ## API
@@ -107,16 +117,26 @@ Each generated sentence will be associated to a score. The highest this score, t
 
 A good `minScore` value totally depends of your corpus, and the number of words of the sentence, so you'll have to try yourself.
 
+##### maxTries
+Type: `integer`  
+Default: `10000`
+
+Sentence generation can (will) take multiple tries to create one that will fulfill all restrictions.
+If this value is exceeded, an error will be thrown. 
+
+#### markov.buildCorpus()
+Return a Promise that will resolve to nothing.
+
+This function **must** be called to build the corpus for Markov generation.  
+It will iterate over all words for all strings from your `data` parameter, so it can take some time depending on its size.
+
 #### markov.generateSentence([options])
-Generate a random sentence.
+Return a Promise that will resolve to an object `{string, score}`
 
 ##### options
 Type: `object`
 
 If set, these options will take precedence over those set in the constructor.
-
-## Todo
-The generator should return a Promise, to not hang the thread.
 
 ## Running the tests
 `npm test`

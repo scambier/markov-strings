@@ -23,13 +23,13 @@ class Generator {
     this.options = this.defaultOptions;
     _.assignIn(this.options, options);
   }
-  
+
   buildCorpus() {
     return new Promise((resolve, reject) => {
       try {
         resolve(this.buildCorpusSync());
       }
-      catch(e) {
+      catch (e) {
         reject(e);
       }
     });
@@ -79,7 +79,7 @@ class Generator {
       try {
         resolve(this.generateSentenceSync(options, check))
       }
-      catch(e) {
+      catch (e) {
         reject(e);
       }
     });
