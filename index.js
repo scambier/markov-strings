@@ -14,7 +14,8 @@ class Generator {
       maxLength: 0,
       minWords : 5,
       maxWords : 0,
-      minScore : 0
+      minScore : 0,
+      maxTries : 10000
     };
 
     // Save options
@@ -70,7 +71,7 @@ class Generator {
     options = this.options;
 
     let corpus = _.cloneDeep(this.corpus);
-    const max = 10000;
+    const max = options.maxTries;
 
     // Loop for maximum tries
     for (let i = 0; i < max; i++) {
