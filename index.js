@@ -5,7 +5,7 @@ const _ = require('lodash');
 class Generator {
   constructor(data, options) {
     this.data = data;
-    this.corpus = {};
+    this.corpus = undefined;
     this.startWords = [];
     this.endWords = [];
 
@@ -38,6 +38,7 @@ class Generator {
   buildCorpusSync() {
     const options = this.options;
 
+    this.corpus = {};
     this.data.forEach(line => {
       const words = line.split(' ');
 
@@ -86,6 +87,9 @@ class Generator {
   }
 
   generateSentenceSync(options, check) {
+    if (!this.corpus) {
+      throw new Error('Corpus is not built.')
+    }
     options = options ? options : {};
     _.assignIn(this.options, options);
     options = this.options;
