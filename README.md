@@ -2,19 +2,44 @@
 [![Coverage Status](https://coveralls.io/repos/github/scambier/markov-strings/badge.svg?branch=master)](https://coveralls.io/github/scambier/markov-strings?branch=master)
 [![npm version](https://badge.fury.io/js/markov-strings.svg)](https://badge.fury.io/js/markov-strings)
 
-#Markov-strings
+<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
-A simplistic Markov chain text generator.
+- [Markov-strings](#markov-strings)
+	- [Prerequisites](#prerequisites)
+	- [Installing](#installing)
+	- [Usage](#usage)
+	- [API](#api)
+		- [new Markov(data, [options])](#new-markovdata-options)
+			- [data](#data)
+			- [options](#options)
+				- [stateSize](#statesize)
+				- [maxLength](#maxlength)
+				- [minWords](#minwords)
+				- [maxWords](#maxwords)
+				- [minScore](#minscore)
+				- [maxTries](#maxtries)
+			- [markov.buildCorpus()](#markovbuildcorpus)
+			- [markov.generateSentence([options])](#markovgeneratesentenceoptions)
+				- [options](#options)
+	- [Running the tests](#running-the-tests)
 
+<!-- /TOC -->
+
+# Markov-strings
+
+A simplistic Markov chain text generator.  
 Give it an array of strings, and it will output a randomly generated string.
 
-##Prerequisites
+This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/BelgicaNews).
+
+
+## Prerequisites
 This module makes use of ES6 features.
 
-##Installing
+## Installing
 `npm install --save markov-strings`
 
-##Usage
+## Usage
 
 ```javascript
 const Markov = require('markov-strings');
@@ -53,7 +78,7 @@ markov.buildCorpus()
 
         console.log(shorterTweet);
         /*
-         Possible output: 
+         Possible output:
          {
            string: 'lorem ipsum dolor sit amet (etc.) https://github.com/scambier/markov-strings',
            score: 42
@@ -65,7 +90,7 @@ markov.buildCorpus()
 
 ```
 ## API
-### Markov(data, [options])
+### new Markov(data, [options])
 Create a generator instance.
 #### data
 Type: `array`
@@ -77,7 +102,7 @@ Type: `object`
 
 You can provide options during the generator instantiation, and/or while calling `generateSentence()`.
 
-The `options` object will alter the quality, length, etc. of the generated sentences. 
+The `options` object will alter the quality, length, etc. of the generated sentences.
 
 Options given to `generateSentence()` overwrite those given during instantiation.
 It can be useful if you wish to generate multiple sentences with slight variations each time.
@@ -122,16 +147,18 @@ Type: `integer`
 Default: `10000`
 
 Sentence generation can (will) take multiple tries to create one that will fulfill all restrictions.
-If this value is exceeded, an error will be thrown. 
+If this value is exceeded, an error will be thrown.
 
 #### markov.buildCorpus()
-Return a Promise that will resolve to nothing.
+Return a Promise that will resolve to nothing.  
+Synced function: `markov.buildCorpusSynced()`
 
 This function **must** be called to build the corpus for Markov generation.  
 It will iterate over all words for all strings from your `data` parameter, so it can take some time depending on its size.
 
 #### markov.generateSentence([options])
-Return a Promise that will resolve to an object `{string, score}`
+Return a Promise that will resolve to an object `{string, score}`  
+Synced function: `markov.generateSetnenceSynced()`
 
 ##### options
 Type: `object`
