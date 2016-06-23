@@ -67,9 +67,23 @@ describe('Generator builder', function() {
       expect(corpus['tempor, erat']).to.contain('vel lacinia');
     });
   });
+
+  describe('Options', function() {
+    it('should take given options into account', function() {
+      const generator = new Generator([], {maxTries: 2});
+      expect(generator.options.maxTries).to.equal(2);
+    })
+  })
 });
 
 describe('Sentence generator', function() {
+
+  it('should throw an error if corpus is not built', function() {
+    const generator = new Generator(data);
+    expect(() => {
+      generator.generateSentenceSync()
+    }).to.throw(Error);
+  });
 
   it('should output a sentence', function() {
     generator.generateSentence({stateSize: 1})
@@ -114,30 +128,53 @@ describe('Sentence generator', function() {
   });
 
   it('should reject because maxLength is unattainable', function() {
-    generator.generateSentence({maxTries: 10, maxLength: 1, minWords: 0, maxWords: 0})
+    generator.generateSentence({maxTries: 100, maxLength: 1, minWords: 0, maxWords: 0})
       .then(result => {
         expect(result).to.throw(Error);
       });
   });
 
   it('should reject because minWords is unattainable', function() {
-    generator.generateSentence({maxTries: 10, minWords: 100})
+    generator.generateSentence({maxTries: 100, minWords: 100})
       .then(result => {
         expect(result).to.throw(Error);
       });
   });
 
   it('should reject because minScore is unattainable', function() {
-    generator.generateSentence({maxTries: 10, minScore: 20})
+    generator.generateSentence({maxTries: 100, minScore: 20})
       .then(result => {
         expect(result).to.throw(Error);
       });
   });
 
   it('should reject because maxWords is unattainable', function() {
-    generator.generateSentence({maxTries: 10, maxWords: 1, minWords: 0})
+    generator.generateSentence({maxTries: 100, maxWords: 1, minWords: 0})
       .then(result => {
         expect(result).to.throw(Error);
+      });
+  });
+
+  it('should reject all sentences because of the callback', function() {
+    generator.generateSentence({
+        maxTries: 100,
+        callback: sentence => {
+          return false;
+        }
+      })
+      .then(result => {
+        expect(result).to.throw(Error);
+      });
+  });
+
+  it('should accept all sentences because of the callback', function() {
+    generator.generateSentence({
+        callback: sentence => {
+          return true;
+        }
+      })
+      .then(result => {
+        expect(result).to.exist;
       });
   });
 
