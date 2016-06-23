@@ -84,7 +84,7 @@ markov.buildCorpus()
         /*
          Possible output:
          {
-           string: 'lorem ipsum dolor sit amet (etc.) https://github.com/scambier/markov-strings',
+           string: 'lorem ipsum dolor sit amet etc. https://github.com/scambier/markov-strings',
            score: 42
          }
          */
