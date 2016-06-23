@@ -26,12 +26,7 @@ class Generator {
 
   buildCorpus() {
     return new Promise((resolve, reject) => {
-      try {
-        resolve(this.buildCorpusSync());
-      }
-      catch (e) {
-        reject(e);
-      }
+      resolve(this.buildCorpusSync());
     });
   }
 
