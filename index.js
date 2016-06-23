@@ -12,7 +12,7 @@ class Generator {
     this.defaultOptions = {
       stateSize: 2,
       maxLength: 0,
-      minWords : 5,
+      minWords : 0,
       maxWords : 0,
       minScore : 0,
       maxTries : 10000
