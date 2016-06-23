@@ -75,10 +75,10 @@ class Generator {
     });
   }
 
-  generateSentence(options, check) {
+  generateSentence(options) {
     return new Promise((resolve, reject) => {
       try {
-        resolve(this.generateSentenceSync(options, check))
+        resolve(this.generateSentenceSync(options))
       }
       catch (e) {
         reject(e);
@@ -86,7 +86,7 @@ class Generator {
     });
   }
 
-  generateSentenceSync(options, check) {
+  generateSentenceSync(options) {
     if (!this.corpus) {
       throw new Error('Corpus is not built.')
     }
@@ -131,11 +131,11 @@ class Generator {
       // Sentence is not ended or incorrect
       if (
         !ended
+        || typeof options.checker === 'function' && !options.checker(sentence)
         || options.minWords > 0 && sentence.split(' ').length < options.minWords
         || options.maxWords > 0 && sentence.split(' ').length > options.maxWords
         || options.maxLength > 0 && sentence.length > options.maxLength
         || score < options.minScore
-        || typeof check === 'function' && !check(sentence)
       ) {
         continue;
       }

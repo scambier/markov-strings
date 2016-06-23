@@ -18,6 +18,7 @@
 				- [maxWords](#maxwords)
 				- [minScore](#minscore)
 				- [maxTries](#maxtries)
+				- [checker(sentence)](#checkersentence)
 			- [markov.buildCorpus()](#markovbuildcorpus)
 			- [markov.generateSentence([options])](#markovgeneratesentenceoptions)
 				- [options](#options)
@@ -52,6 +53,9 @@ const options = {
   maxLength: 140,
   minWords: 10,
   minScore: 25,
+  checker: sentence => {
+    return sentence.endsWith('.'); // I want my tweets to end with a dot.
+  }
 };
 
 // Instantiate the generator
@@ -86,9 +90,8 @@ markov.buildCorpus()
          */
       })
   });
-
-
 ```
+
 ## API
 ### new Markov(data, [options])
 Create a generator instance.
@@ -148,6 +151,13 @@ Default: `10000`
 
 Sentence generation can (will) take multiple tries to create one that will fulfill all restrictions.
 If this value is exceeded, an error will be thrown.
+
+##### checker(sentence)
+Type: `function`  
+
+In addition to all previous options, you can define your own checking function that will be called once the sentence is generated.
+If this callback returns `false`, the sentence is rejected and a new one is generated.
+
 
 #### markov.buildCorpus()
 Return a Promise that will resolve to nothing.  
