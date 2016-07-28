@@ -161,14 +161,14 @@ If this callback returns `false`, the sentence is rejected and a new one is gene
 
 #### markov.buildCorpus()
 Return a Promise that will resolve to nothing.  
-Synced function: `markov.buildCorpusSynced()`
+Synced function: `markov.buildCorpusSync()`
 
 This function **must** be called to build the corpus for Markov generation.  
 It will iterate over all words for all strings from your `data` parameter, so it can take some time depending on its size.
 
 #### markov.generateSentence([options])
 Return a Promise that will resolve to an object `{string, score}`  
-Synced function: `markov.generateSetnenceSynced()`
+Synced function: `markov.generateSentenceSync()`
 
 ##### options
 Type: `object`
