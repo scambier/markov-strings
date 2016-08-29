@@ -17,6 +17,7 @@
 				- [minWords](#minwords)
 				- [maxWords](#maxwords)
 				- [minScore](#minscore)
+				- [minScorePerWord](#minscoreperword)
 				- [maxTries](#maxtries)
 				- [checker(sentence)](#checkersentence)
 			- [markov.buildCorpus()](#markovbuildcorpus)
@@ -144,6 +145,12 @@ Default: `0`
 Each generated sentence will be associated to a score. The highest this score, the more random the sentence should be.
 
 A good `minScore` value totally depends of your corpus, and the number of words of the sentence, so you'll have to try yourself.
+
+##### minScorePerWord
+Type: `integer`  
+Default: `0`
+
+Same as above, but averaged for each word in the returned sentence.
 
 ##### maxTries
 Type: `integer`  
