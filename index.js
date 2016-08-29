@@ -12,10 +12,11 @@ class Generator {
     this.defaultOptions = {
       stateSize: 2,
       maxLength: 0,
-      minWords : 0,
-      maxWords : 0,
-      minScore : 0,
-      maxTries : 10000
+      minWords: 0,
+      maxWords: 0,
+      minScore: 0,
+      minScorePerWord: 0,
+      maxTries: 10000
     };
 
     // Save options
@@ -120,6 +121,7 @@ class Generator {
           break;
         }
       }
+      const scorePerWord = parseInt(score/arr.length);
 
       const sentence = arr.join(' ').trim();
 
@@ -131,11 +133,12 @@ class Generator {
         || options.maxWords > 0 && sentence.split(' ').length > options.maxWords
         || options.maxLength > 0 && sentence.length > options.maxLength
         || score < options.minScore
+        || scorePerWord < options.minScorePerWord
       ) {
         continue;
       }
 
-      return {string: sentence, score: score};
+      return {string: sentence, score: score, scorePerWord: scorePerWord};
     }
 
     throw new Error('Cannot build sentence with current corpus and options');
