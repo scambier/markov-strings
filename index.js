@@ -62,16 +62,20 @@ class Generator {
 
       // Start words
       const start = _.slice(words, 0, options.stateSize).join(' ');
-      const startObj = { words: start, ref: item };
-      if (!_.some(this.startWords, startObj)) {
-        this.startWords.push(startObj);
+      const oldStartObj = _.find(this.startWords, o => o.words == start);
+      if (oldStartObj) {
+        if (!_.includes(oldStartObj.refs, item)) { oldStartObj.refs.push(item); }
+      } else {
+        this.startWords.push({ words: start, refs: [item] });
       }
 
       // End words
       const end = _.slice(words, words.length - options.stateSize, words.length).join(' ');
-      const endObj = { words: end, ref: item };
-      if (!_.some(this.endWords, endObj)) {
-        this.endWords.push(endObj);
+      const oldEndObj = _.find(this.endWords, o => o.words == end);
+      if (oldEndObj) {
+        if (!_.includes(oldEndObj.refs, item)) { oldEndObj.refs.push(item); }
+      } else {
+        this.endWords.push({ words: end, refs: [item] });
       }
 
       // Build corpus
@@ -83,13 +87,16 @@ class Generator {
         }
 
         // Add block to corpus
-        const nextObj = { words: next, ref: item }
         if (this.corpus.hasOwnProperty(curr)) {
-          if (!_.some(this.corpus[curr], nextObj)) {
-            this.corpus[curr].push(nextObj);
+          // If corpus already owns this chain
+          const oldObj = _.find(this.corpus[curr], o => o.words == next);
+          if (oldObj) {
+            oldObj.refs.push(item);
+          } else {
+            this.corpus[curr].push({ words: next, refs: [item] })
           }
         } else {
-          this.corpus[curr] = [nextObj];
+          this.corpus[curr] = [{ words: next, refs: [item] }];
         }
       }
     });

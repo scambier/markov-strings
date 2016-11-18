@@ -27,7 +27,7 @@ describe('Options parser', function () {
   });
 });
 
-describe('Generator builder', function () {
+describe('In buildCorpus,', function () {
 
   describe('StartWords array', function () {
     it('should contain the right values', function () {
@@ -42,7 +42,6 @@ describe('Generator builder', function () {
     });
 
     it('should have the right length', function () {
-      console.log(generator.startWords)
       expect(generator.startWords).to.have.lengthOf(7);
     });
   });
@@ -54,21 +53,21 @@ describe('Generator builder', function () {
 
     it('should contain the right values', function () {
       const end = generator.endWords;
-      expect(end).to.contain('sit amet');
-      expect(end).to.contain('start words');
-      expect(end).to.contain('adipiscing elit');
-      expect(end).to.contain('fringilla dui');
-      expect(end).to.contain('ut lacus');
-      expect(end).to.contain('est rien…');
+      expect(_.some(end, { words: 'sit amet' })).to.be.true;
+      expect(_.some(end, { words: 'start words' })).to.be.true;
+      expect(_.some(end, { words: 'adipiscing elit' })).to.be.true;
+      expect(_.some(end, { words: 'fringilla dui' })).to.be.true;
+      expect(_.some(end, { words: 'ut lacus' })).to.be.true;
+      expect(_.some(end, { words: 'est rien…' })).to.be.true;
     });
   });
 
   describe('Corpus', function () {
     it('should have the right values for the right keys', function () {
       const corpus = generator.corpus;
-      expect(corpus['Lorem ipsum']).to.contain('dolor sit');
-      expect(corpus['Lorem ipsum']).to.contain('duplicate start');
-      expect(corpus['tempor, erat']).to.contain('vel lacinia');
+      expect(_.some(corpus['Lorem ipsum'], { words: 'dolor sit' })).to.be.true;
+      expect(_.some(corpus['Lorem ipsum'], { words: 'duplicate start' })).to.be.true;
+      expect(_.some(corpus['tempor, erat'], { words: 'vel lacinia' })).to.be.true;
     });
   });
 
