@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/scambier/markov-strings.svg?branch=master)](https://travis-ci.org/scambier/markov-strings)
 [![Coverage Status](https://coveralls.io/repos/github/scambier/markov-strings/badge.svg?branch=master)](https://coveralls.io/github/scambier/markov-strings?branch=master)
-[![npm version](https://badge.fury.io/js/markov-strings.svg)](https://badge.fury.io/js/markov-strings)
+[![npm version](https://badge.fury.io/js/markov-strings.svg)](https://badge.fury.io/js/markov-strings) [![dep](https://david-dm.org/scambier/markov-strings.svg)](https://david-dm.org/scambier/markov-strings#info=devDependencies)
 
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
@@ -23,6 +23,7 @@
 			- [markov.buildCorpus()](#markovbuildcorpus)
 			- [markov.generateSentence([options])](#markovgeneratesentenceoptions)
 				- [options](#options)
+	- [Changelog](#changelog)
 	- [Running the tests](#running-the-tests)
 
 <!-- /TOC -->
@@ -181,6 +182,10 @@ Synced function: `markov.generateSentenceSync()`
 Type: `object`
 
 If set, these options will take precedence over those set in the constructor.
+
+## Changelog
+
+**1.2.0** Added a changelog
 
 ## Running the tests
 `npm test`
