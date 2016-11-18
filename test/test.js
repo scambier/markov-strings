@@ -27,7 +27,7 @@ describe('Options parser', function () {
   });
 });
 
-describe('In buildCorpus,', function () {
+describe('In buildCorpus', function () {
 
   describe('StartWords array', function () {
     it('should contain the right values', function () {
@@ -88,77 +88,86 @@ describe('Sentence generator', function () {
     }).to.throw(Error);
   });
 
-  it('should output a sentence', function () {
+  it('should output a sentence', function (done) {
     generator.generateSentence({ stateSize: 1 })
       .then(result => {
         expect(result).to.exist;
+        done();
       });
   });
 
-  it('should throw an error when a sentence cannot be built', function () {
+  it('should throw an error when a sentence cannot be built', function (done) {
     for (let i = 0; i < 10; i++) {
       generator.generateSentence({ stateSize: 3 })
         .then(result => {
           expect(result).to.throw(Error);
+          done();
         });
     }
   });
 
-  it('should end with a value from endWords', function () {
+  it('should end with a value from endWords', function (done) {
     for (let i = 0; i < 10; i++) {
       generator.generateSentence()
         .then(result => {
           const arr = result.split(' ');
           const end = arr.slice(arr.length - 2, arr.length);
           expect(generator.endWords).to.contain(end.join(' '));
+          done();
         });
     }
   });
 
-  it('should reject the sentence', function () {
+  it('should reject the sentence', function (done) {
     const options = { minWords: 5, maxTries: 10 };
     generator.generateSentence(options, result => result.split(' ').length < 5)
       .then(result => {
         expect(result).to.throw(Error);
+        done();
       });
   });
 
-  it('should accept the sentence', function () {
+  it('should accept the sentence', function (done) {
     generator.generateSentence({}, result => true)
       .then(result => {
         expect(result).to.exist;
+        done();
       });
   });
 
-  it('should reject because maxLength is unattainable', function () {
+  it('should reject because maxLength is unattainable', function (done) {
     generator.generateSentence({ maxTries: 100, maxLength: 1, minWords: 0, maxWords: 0 })
       .then(result => {
         expect(result).to.throw(Error);
+        done();
       });
   });
 
-  it('should reject because minWords is unattainable', function () {
+  it('should reject because minWords is unattainable', function (done) {
     generator.generateSentence({ maxTries: 100, minWords: 100 })
       .then(result => {
         expect(result).to.throw(Error);
+        done();
       });
   });
 
-  it('should reject because minScore is unattainable', function () {
+  it('should reject because minScore is unattainable', function (done) {
     generator.generateSentence({ maxTries: 100, minScore: 20 })
       .then(result => {
         expect(result).to.throw(Error);
+        done();
       });
   });
 
-  it('should reject because maxWords is unattainable', function () {
+  it('should reject because maxWords is unattainable', function (done) {
     generator.generateSentence({ maxTries: 100, maxWords: 1, minWords: 0 })
       .then(result => {
         expect(result).to.throw(Error);
+        done();
       });
   });
 
-  it('should reject all sentences because of the callback', function () {
+  it('should reject all sentences because of the callback', function (done) {
     generator.generateSentence({
         maxTries: 100,
         callback: sentence => {
@@ -167,10 +176,11 @@ describe('Sentence generator', function () {
       })
       .then(result => {
         expect(result).to.throw(Error);
+        done();
       });
   });
 
-  it('should accept all sentences because of the callback', function () {
+  it('should accept all sentences because of the callback', function (done) {
     generator.generateSentence({
         callback: sentence => {
           return true;
@@ -178,6 +188,7 @@ describe('Sentence generator', function () {
       })
       .then(result => {
         expect(result).to.exist;
+        done();
       });
   });
 
