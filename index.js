@@ -105,20 +105,21 @@ class Generator {
   generateSentence(options) {
     return new Promise((resolve, reject) => {
       try {
-        resolve(this.generateSentenceSync(options))
+        const result = this.generateSentenceSync(options);
+        resolve(result);
       } catch (e) {
         reject(e);
       }
     });
   }
 
-  generateSentenceSync(options) {
+  generateSentenceSync(options = {}) {
     if (!this.corpus) {
       throw new Error('Corpus is not built.')
     }
-    options = options ? options : {};
-    _.assignIn(this.options, options);
-    options = this.options;
+    const newOptions = {};
+    _.assignIn(newOptions, this.options, options);
+    options = newOptions;
 
     const corpus = _.cloneDeep(this.corpus);
     const max = options.maxTries;
@@ -131,8 +132,8 @@ class Generator {
 
       // Loop to build sentence
       while (true) {
-        const key = arr[arr.length - 1]; // Last value in array
-        const state = _.sample(corpus[key]);
+        const block = arr[arr.length - 1]; // Last value in array
+        const state = _.sample(corpus[block.words]);
 
         // Sentence cannot be finished
         if (!state) {
@@ -143,21 +144,21 @@ class Generator {
         arr.push(state);
 
         // Increment score
-        score += corpus[key].length - 1; // Increment score
+        score += corpus[block.words].length - 1; // Increment score
 
         // Is sentence finished?
-        if (_.includes(this.endWords, state)) {
+        if (_.some(this.endWords, { words: state.words })) {
           ended = true;
           break;
         }
       }
       const scorePerWord = parseInt(score / arr.length);
 
-      const sentence = arr.join(' ').trim();
+      const sentence = _.map(arr, 'words').join(' ').trim();
 
       // Sentence is not ended or incorrect
       if (!ended ||
-        typeof options.checker === 'function' && !options.checker(sentence) ||
+        typeof options.checker === 'function' && !options.checker(sentence) || // checker cb returns false
         options.minWords > 0 && sentence.split(' ').length < options.minWords ||
         options.maxWords > 0 && sentence.split(' ').length > options.maxWords ||
         options.maxLength > 0 && sentence.length > options.maxLength ||
@@ -170,10 +171,10 @@ class Generator {
       return {
         string: sentence,
         score: score,
-        scorePerWord: scorePerWord
+        scorePerWord: scorePerWord,
+        refs: _.uniqBy(_.flatten(_.map(arr, 'refs')), 'string')
       };
     }
-
     throw new Error('Cannot build sentence with current corpus and options');
   }
 }
