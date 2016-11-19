@@ -43,6 +43,9 @@ class Generator {
       })
       return newData;
     }
+    if (!data[0].hasOwnProperty('string')) {
+      throw new Error('Objects in your corpus must have a "string" property');
+    }
     return data;
   }
 
