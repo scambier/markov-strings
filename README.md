@@ -87,7 +87,9 @@ markov.buildCorpus()
          Possible output:
          {
            string: 'lorem ipsum dolor sit amet etc. https://github.com/scambier/markov-strings',
-           score: 42
+           score: 42,
+           scorePerWord: 6,
+           refs: [ an array of objects ]
          }
          */
       })
@@ -100,7 +102,10 @@ Create a generator instance.
 #### data
 Type: `array`
 
-`data` is an array of strings (sentences). The bigger the array, the better and more various the results.
+`data` is an array of strings (sentences), or an array of objects. If you wish to use objects, each one must have a `string` attribute. The bigger the array, the better and more various the results.
+
+Examples:  
+`[ 'lorem ipsum', 'dolor sit amet' ]` or `[ { string: 'lorem ipsum', attr: 'value' }, { string: 'dolor sit amet', attr: 'other value' } ]`
 
 #### options
 Type: `object`
@@ -115,6 +120,8 @@ It can be useful if you wish to generate multiple sentences with slight variatio
 ##### stateSize
 Type: `integer`  
 Default: `2`
+
+Note: this option cannot be used in `generateSentence()`
 
 The number of words for each state.  
 `1` will output gibberish sentences without much sense.  
@@ -175,8 +182,10 @@ This function **must** be called to build the corpus for Markov generation.
 It will iterate over all words for all strings from your `data` parameter, so it can take some time depending on its size.
 
 #### markov.generateSentence([options])
-Return a Promise that will resolve to an object `{string, score}`  
+Return a Promise that will resolve to an object `{string, score, scorePerWord, refs}`  
 Synced function: `markov.generateSentenceSync()`
+
+The `refs` array will contain all objects that have been used to build the sentence. May be useful to fetch some meta data or make some stats.
 
 ##### options
 Type: `object`
@@ -185,7 +194,10 @@ If set, these options will take precedence over those set in the constructor.
 
 ## Changelog
 
-**1.2.0** Added a changelog
+### 1.3.0
+- New feature: the generator now accepts arrays of objects, and tells the user which objects were used to build a sentence
+- Fixed all unit tests
+- Added a changelog
 
 ## Running the tests
 `npm test`
