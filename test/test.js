@@ -73,7 +73,7 @@ describe('In buildCorpus', function () {
 
   describe('Options', function () {
     it('should take given options into account', function () {
-      const generator = new Generator([], { maxTries: 2 });
+      const generator = new Generator(['lorem'], { maxTries: 2 });
       expect(generator.options.maxTries).to.equal(2);
     })
   })
