@@ -47,8 +47,28 @@ This module makes use of ES6 features.
 ```javascript
 const Markov = require('markov-strings');
 
-// An array of strings
+
+// 1) Simple way
+
 const data = [/* insert a few hundreds/thousands sentences here */];
+const markov = new Markov(data);
+markov.buildCorpusSync();
+const result = markov.generateSentenceSync();
+console.log(result);
+/*
+{
+  string: 'lorem ipsum dolor sit amet etc',
+  score: 42,
+  scorePerWord: 7,
+  refs: [ an array of objects ]
+}
+*/
+
+
+
+// 2) More complete way with options and Promises
+
+const data = [/* insert a few hundreds/thousands objects here, each one with a "string" attribute */];
 
 // Some options to generate Twitter-ready strings
 const options = {
@@ -63,9 +83,11 @@ const options = {
 // Instantiate the generator
 const markov = new Markov(data, options);
 
+
 // Build the corpus
 markov.buildCorpus()
   .then(() => {
+
     // Generate some tweets
     const tweets = [];
     for (let i = 0; i < 10; i++) {
@@ -80,18 +102,17 @@ markov.buildCorpus()
         maxLength: 140 - 24
       })
       .then(shorterTweet => {
-        shorterTweet += ' https://github.com/scambier/markov-strings'; // Links always take 23 characters in a tweet
+        shorterTweet.string += ' https://github.com/scambier/markov-strings'; // Links always take 23 characters in a tweet
 
         console.log(shorterTweet);
         /*
-         Possible output:
-         {
-           string: 'lorem ipsum dolor sit amet etc. https://github.com/scambier/markov-strings',
-           score: 42,
-           scorePerWord: 6,
-           refs: [ an array of objects ]
-         }
-         */
+        {
+          string: 'lorem ipsum dolor sit amet etc. https://github.com/scambier/markov-strings',
+          score: 42,
+          scorePerWord: 7,
+          refs: [ an array of objects ]
+        }
+        */
       })
   });
 ```
