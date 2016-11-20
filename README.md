@@ -215,6 +215,10 @@ If set, these options will take precedence over those set in the constructor.
 
 ## Changelog
 
+### 1.3.1
+- Updated README example
+- Removed a useless line
+
 ### 1.3.0
 - New feature: the generator now accepts arrays of objects, and tells the user which objects were used to build a sentence
 - Fixed all unit tests
