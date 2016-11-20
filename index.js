@@ -10,7 +10,7 @@ class Generator {
    * @param options An object of options. If not set, sensible defaults will be used.
    */
   constructor(data, options = {}) {
-    this.data = this.formatData(data);
+    this.data = data;
 
     this.corpus = undefined;
     this.startWords = [];
@@ -56,6 +56,8 @@ class Generator {
 
   buildCorpusSync() {
     const options = this.options;
+
+    this.data = this.formatData(this.data);
 
     this.corpus = {};
     this.data.forEach(item => {
