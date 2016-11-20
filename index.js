@@ -9,7 +9,7 @@ class Generator {
    * @param data An array of strings or objects. If 'data' is an array of objects, each object must have a 'string' attribute
    * @param options An object of options. If not set, sensible defaults will be used.
    */
-  constructor(data, options) {
+  constructor(data, options = {}) {
     this.data = this.formatData(data);
 
     this.corpus = undefined;
@@ -27,7 +27,6 @@ class Generator {
     };
 
     // Save options
-    options = options ? options : {};
     this.options = this.defaultOptions;
     _.assignIn(this.options, options);
   }
