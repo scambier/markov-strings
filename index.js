@@ -135,7 +135,8 @@ class Generator {
       let score = 0;
 
       // Loop to build sentence
-      while (true) {
+      let limit = 0;
+      while (limit < max) {
         const block = arr[arr.length - 1]; // Last value in array
         const state = _.sample(corpus[block.words]);
 
@@ -151,10 +152,13 @@ class Generator {
         score += corpus[block.words].length - 1; // Increment score
 
         // Is sentence finished?
-        if (_.some(this.endWords, { words: state.words })) {
+        const endObj = _.some(this.endWords, { words: state.words });
+        if (endObj) {
+          arr.push(endObj);
           ended = true;
           break;
         }
+        limit++;
       }
       const scorePerWord = parseInt(score / arr.length);
 
