@@ -152,9 +152,7 @@ class Generator {
         score += corpus[block.words].length - 1; // Increment score
 
         // Is sentence finished?
-        const endObj = _.some(this.endWords, { words: state.words });
-        if (endObj) {
-          arr.push(endObj);
+        if (_.some(this.endWords, { words: state.words })) {
           ended = true;
           break;
         }
