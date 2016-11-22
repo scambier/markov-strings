@@ -215,6 +215,10 @@ If set, these options will take precedence over those set in the constructor.
 
 ## Changelog
 
+### 1.3.2
+- Fixed an infinite loop bug
+- Performance improvement
+
 ### 1.3.1
 - Updated README example
 - Removed a useless line
