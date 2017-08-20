@@ -2,6 +2,13 @@
 [![Coverage Status](https://coveralls.io/repos/github/scambier/markov-strings/badge.svg?branch=master)](https://coveralls.io/github/scambier/markov-strings?branch=master)
 [![npm version](https://badge.fury.io/js/markov-strings.svg)](https://badge.fury.io/js/markov-strings) [![dep](https://david-dm.org/scambier/markov-strings.svg)](https://david-dm.org/scambier/markov-strings#info=devDependencies)
 
+
+# Markov-strings
+A simplistic Markov chain text generator.  
+Give it an array of strings, and it will output a randomly generated string.
+
+This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/BelgicaNews).
+
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Prerequisites](#prerequisites)
@@ -30,13 +37,6 @@
 - [Running the tests](#running-the-tests)
 
 <!-- /TOC -->
-
-# Markov-strings
-A simplistic Markov chain text generator.  
-Give it an array of strings, and it will output a randomly generated string.
-
-This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/BelgicaNews).
-
 
 ## Prerequisites
 This module makes use of ES6 features.
