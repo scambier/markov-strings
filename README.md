@@ -2,34 +2,36 @@
 [![Coverage Status](https://coveralls.io/repos/github/scambier/markov-strings/badge.svg?branch=master)](https://coveralls.io/github/scambier/markov-strings?branch=master)
 [![npm version](https://badge.fury.io/js/markov-strings.svg)](https://badge.fury.io/js/markov-strings) [![dep](https://david-dm.org/scambier/markov-strings.svg)](https://david-dm.org/scambier/markov-strings#info=devDependencies)
 
-<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
-- [Markov-strings](#markov-strings)
-	- [Prerequisites](#prerequisites)
-	- [Installing](#installing)
-	- [Usage](#usage)
-	- [API](#api)
-		- [new Markov(data, [options])](#new-markovdata-options)
-			- [data](#data)
-			- [options](#options)
-				- [stateSize](#statesize)
-				- [maxLength](#maxlength)
-				- [minWords](#minwords)
-				- [maxWords](#maxwords)
-				- [minScore](#minscore)
-				- [minScorePerWord](#minscoreperword)
-				- [maxTries](#maxtries)
-				- [checker(sentence)](#checkersentence)
-			- [markov.buildCorpus()](#markovbuildcorpus)
-			- [markov.generateSentence([options])](#markovgeneratesentenceoptions)
-				- [options](#options)
-	- [Changelog](#changelog)
-	- [Running the tests](#running-the-tests)
+- [Prerequisites](#prerequisites)
+- [Installing](#installing)
+- [Usage](#usage)
+- [API](#api)
+	- [new Markov(data, [options])](#new-markovdata-options)
+		- [data](#data)
+		- [options](#options)
+			- [stateSize](#statesize)
+			- [maxLength](#maxlength)
+			- [minWords](#minwords)
+			- [maxWords](#maxwords)
+			- [minScore](#minscore)
+			- [minScorePerWord](#minscoreperword)
+			- [maxTries](#maxtries)
+			- [checker(sentence)](#checkersentence)
+	- [markov.buildCorpus()](#markovbuildcorpus)
+	- [markov.generateSentence([options])](#markovgeneratesentenceoptions)
+		- [options](#options)
+- [Changelog](#changelog)
+	- [1.3.3](#133)
+	- [1.3.2](#132)
+	- [1.3.1](#131)
+	- [1.3.0](#130)
+- [Running the tests](#running-the-tests)
 
 <!-- /TOC -->
 
 # Markov-strings
-
 A simplistic Markov chain text generator.  
 Give it an array of strings, and it will output a randomly generated string.
 
@@ -43,7 +45,6 @@ This module makes use of ES6 features.
 `npm install --save markov-strings`
 
 ## Usage
-
 ```javascript
 const Markov = require('markov-strings');
 
@@ -118,8 +119,10 @@ markov.buildCorpus()
 ```
 
 ## API
+
 ### new Markov(data, [options])
 Create a generator instance.
+
 #### data
 Type: `array`
 
@@ -195,25 +198,28 @@ In addition to all previous options, you can define your own checking function t
 If this callback returns `false`, the sentence is rejected and a new one is generated.
 
 
-#### markov.buildCorpus()
+### markov.buildCorpus()
 Return a Promise that will resolve to nothing.  
 Synced function: `markov.buildCorpusSync()`
 
 This function **must** be called to build the corpus for Markov generation.  
 It will iterate over all words for all strings from your `data` parameter, so it can take some time depending on its size.
 
-#### markov.generateSentence([options])
+### markov.generateSentence([options])
 Return a Promise that will resolve to an object `{string, score, scorePerWord, refs}`  
 Synced function: `markov.generateSentenceSync()`
 
 The `refs` array will contain all objects that have been used to build the sentence. May be useful to fetch some meta data or make some stats.
 
-##### options
+#### options
 Type: `object`
 
 If set, these options will take precedence over those set in the constructor.
 
 ## Changelog
+
+### 1.3.3
+- Updated README. Version bump for npm
 
 ### 1.3.2
 - Fixed an infinite loop bug
