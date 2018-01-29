@@ -1,7 +1,8 @@
 'use strict';
 
 const _ = require('lodash'),
-  debug = require('debug')('markov-strings');
+  debug = require('debug'),
+  warn  = debug('markov-strings:warning');
 
 class Generator {
   /**
@@ -10,6 +11,8 @@ class Generator {
    * @param options An object of options. If not set, sensible defaults will be used.
    */
   constructor(data, options = {}) {
+    this._checkOptions(options, 'constructor');
+
     this.data = data;
 
     this.corpus = undefined;
@@ -29,6 +32,18 @@ class Generator {
     // Save options
     this.options = this.defaultOptions;
     _.assignIn(this.options, options);
+  }
+
+  _checkOptions(options, methodName) {
+    if (options && typeof options.checker !== 'undefined') {
+      warn(
+        `You've passed an 'options' object with 'checker' ` +
+        `property set to 'Generator.${methodName}'. ` +
+        `'checker(sentence)' property is deprecated and will be removed ` +
+        `in future versions of the library. ` +
+        `Please use 'filter(result)' property instead.`
+      );
+    }
   }
 
   formatData(data) {
@@ -107,6 +122,8 @@ class Generator {
   }
 
   generateSentence(options) {
+    this._checkOptions(options, 'generateSentence');
+
     return new Promise((resolve, reject) => {
       try {
         const result = this.generateSentenceSync(options);
@@ -121,6 +138,9 @@ class Generator {
     if (!this.corpus) {
       throw new Error('Corpus is not built.')
     }
+
+    this._checkOptions(options, 'generateSentenceSync');
+
     const newOptions = {};
     _.assignIn(newOptions, this.options, options);
     options = newOptions;
@@ -161,10 +181,17 @@ class Generator {
       const scorePerWord = parseInt(score / arr.length);
 
       const sentence = _.map(arr, 'words').join(' ').trim();
+      const result = {
+        string: sentence,
+        score: score,
+        scorePerWord: scorePerWord,
+        refs: _.uniqBy(_.flatten(_.map(arr, 'refs')), 'string')
+      };
 
       // Sentence is not ended or incorrect
       if (!ended ||
         typeof options.checker === 'function' && !options.checker(sentence) || // checker cb returns false
+        typeof options.filter === 'function' && !options.filter(result) ||
         options.minWords > 0 && sentence.split(' ').length < options.minWords ||
         options.maxWords > 0 && sentence.split(' ').length > options.maxWords ||
         options.maxLength > 0 && sentence.length > options.maxLength ||
@@ -174,12 +201,7 @@ class Generator {
         continue;
       }
 
-      return {
-        string: sentence,
-        score: score,
-        scorePerWord: scorePerWord,
-        refs: _.uniqBy(_.flatten(_.map(arr, 'refs')), 'string')
-      };
+      return result;
     }
     throw new Error('Cannot build sentence with current corpus and options');
   }

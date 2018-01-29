@@ -110,17 +110,67 @@ describe('Sentence generator', function () {
     }
   });
 
-  it('should reject the sentence', function (done) {
+  it(`should invoke 'filter'`, function (done) {
+    let wasFilterCalled = false;
+    const options = {
+      filter: () => {
+        wasFilterCalled = true;
+        return true;
+      }
+    };
+
+    generator.generateSentence(options)
+      .then(() => {
+        expect(wasFilterCalled).to.equal(true);
+        done();
+      })
+      .catch(done);
+  });
+
+  it(`should pass the result object to 'filter(result)'`, function (done) {
     const options = {
       minWords: 5,
       maxTries: 10,
-      checker: result => result.string.split(' ').length < 5
+      filter: (result) => {
+        expect(result).to.have.property('string');
+        expect(result).to.have.property('score');
+        expect(result).to.have.property('scorePerWord');
+        expect(result).to.have.property('refs');
+        expect(result.refs).to.be.an('array');
+        return true;
+      }
     };
+
     generator.generateSentence(options)
+      .then(() => done())
+      .catch(done);
+  });
+
+  it(`should reject the sentence based on 'filter'`, function (done) {
+    const options = {
+      minWords: 5,
+      maxTries: 10,
+      filter: result => result.string.split(' ').length < 5
+    };
+
+    generator.generateSentence(options)
+      .then(result => {
+        done(new Error(
+          `Sentence was generated when no result was expected. ` +
+          `Sentence: ${result.string}`
+        ));
+      })
       .catch(e => {
         expect(e).to.be.an('error');
+        expect(e.message).to.equal(
+          'Cannot build sentence with current corpus and options'
+        );
+
+        // Test passed
         done();
       })
+      // Assertions in previous "catch" block failed - test failed
+      .catch(done);
   });
 
   it('should reject because maxLength is unattainable', function (done) {
@@ -128,7 +178,8 @@ describe('Sentence generator', function () {
       .catch(e => {
         expect(e).to.be.an('error');
         done();
-      });
+      })
+      .catch(done);
   });
 
   it('should reject because minWords is unattainable', function (done) {
