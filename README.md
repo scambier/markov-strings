@@ -4,7 +4,7 @@
 
 
 # Markov-strings
-A simplistic Markov chain text generator.
+A simplistic Markov chain text generator.  
 Give it an array of strings, and it will output a randomly generated string.
 
 This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/BelgicaNews).
@@ -143,7 +143,7 @@ Options given to `generateSentence()` overwrite those given during instantiation
 It can be useful if you wish to generate multiple sentences with slight variations each time.
 
 ##### stateSize
-Type: `integer`
+Type: `integer`  
 Default: `2`
 
 Note: this option cannot be used in `generateSentence()`
@@ -154,25 +154,25 @@ The number of words for each state.
 `3` and more could create good sentences, at the expense of randomness. You'll need a good corpus, though.
 
 ##### maxLength
-Type: `integer`
+Type: `integer`  
 Default: `0`
 
 Maximum characters.
 
 ##### minWords
-Type: `integer`
+Type: `integer`  
 Default: `5`
 
 Minimum number of words.
 
 ##### maxWords
-Type: `integer`
+Type: `integer`  
 Default: `0`
 
 Maximum number of words.
 
 ##### minScore
-Type: `integer`
+Type: `integer`  
 Default: `0`
 
 Each generated sentence will be associated to a score. The highest this score, the more random the sentence should be.
@@ -180,13 +180,13 @@ Each generated sentence will be associated to a score. The highest this score, t
 A good `minScore` value totally depends of your corpus, and the number of words of the sentence, so you'll have to try yourself.
 
 ##### minScorePerWord
-Type: `integer`
+Type: `integer`  
 Default: `0`
 
 Same as above, but averaged for each word in the returned sentence.
 
 ##### maxTries
-Type: `integer`
+Type: `integer`  
 Default: `10000`
 
 Sentence generation can (will) take multiple tries to create one that will fulfill all restrictions.
@@ -207,14 +207,14 @@ You can use this option to filters out possible results. A possible result is an
 
 
 ### markov.buildCorpus()
-Return a Promise that will resolve to nothing.
+Return a Promise that will resolve to nothing.  
 Synced function: `markov.buildCorpusSync()`
 
 This function **must** be called to build the corpus for Markov generation.
 It will iterate over all words for all strings from your `data` parameter, so it can take some time depending on its size.
 
 ### markov.generateSentence([options])
-Return a Promise that will resolve to an object `{string, score, scorePerWord, refs}`
+Return a Promise that will resolve to an object `{string, score, scorePerWord, refs}`  
 Synced function: `markov.generateSentenceSync()`
 
 The `refs` array will contain all objects that have been used to build the sentence. May be useful to fetch some meta data or make some stats.
@@ -226,18 +226,21 @@ If set, these options will take precedence over those set in the constructor.
 
 ## Changelog
 
-### 1.3.3
+**1.3.4 - 1.3.5**
+- Dependencies update
+
+**1.3.3**
 - Updated README. Version bump for npm
 
-### 1.3.2
+**1.3.2**
 - Fixed an infinite loop bug
 - Performance improvement
 
-### 1.3.1
+**1.3.1**
 - Updated README example
 - Removed a useless line
 
-### 1.3.0
+**1.3.0**
 - New feature: the generator now accepts arrays of objects, and tells the user which objects were used to build a sentence
 - Fixed all unit tests
 - Added a changelog
