@@ -226,6 +226,9 @@ If set, these options will take precedence over those set in the constructor.
 
 ## Changelog
 
+**1.4.0**
+- New `filter()` method, thanks @flpvsk
+
 **1.3.4 - 1.3.5**
 - Dependencies update
 
