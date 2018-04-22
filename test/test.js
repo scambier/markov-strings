@@ -14,7 +14,7 @@ const data = [
   "Fusce tincidunt tempor, erat vel lacinia vel ex pharetra pretium lacinia imperdiet"
 ];
 
-const Generator = require('../index');
+const Generator = require('../dist/index');
 const generator = new Generator(data);
 
 beforeEach(function (done) {

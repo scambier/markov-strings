@@ -1,8 +1,9 @@
 {
   "name": "markov-strings",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "A Markov string generator",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "node node_modules/mocha/bin/_mocha --reporter spec",
     "cover": "node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
@@ -25,6 +26,7 @@
   "author": "scambier",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^9.6.6",
     "chai": "^3.5.0",
     "coveralls": "^2.11.9",
     "istanbul": "^0.4.3",

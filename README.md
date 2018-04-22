@@ -44,8 +44,7 @@ This module makes use of ES6 features.
 
 ## Usage
 ```javascript
-const Markov = require('markov-strings');
-
+const Markov = require('markov-strings'); // TypeScript: import Markov from 'markov-strings'
 
 // 1) Simple way
 
@@ -62,7 +61,6 @@ console.log(result);
   refs: [ an array of objects ]
 }
 */
-
 
 
 // 2) More complete way with options and Promises
@@ -222,6 +220,9 @@ Type: `object`
 If set, these options will take precedence over those set in the constructor.
 
 ## Changelog
+
+**1.5.0**
+- Code rewritten in TypeScript. You can now `import MarkovGenerator from  'markov-strings'`
 
 **1.4.0**
 - New `filter()` method, thanks @flpvsk
