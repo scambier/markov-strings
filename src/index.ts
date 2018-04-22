@@ -1,32 +1,10 @@
+import { MarkovCorpusItem, MarkovOptions, MarkovResult } from "./types"
+
 const _ = require("lodash")
 const debug = require("debug")
 const warn = debug("markov-strings:warning")
 
-export type MarkovOptions = {
-  stateSize?: number
-  maxLength?: number
-  minWords?: number
-  maxWords?: number
-  minScore?: number
-  minScorePerWord?: number
-  maxTries?: number
-  checker?: (result: string) => boolean
-  filter?: (result: MarkovResult) => boolean
-}
-
-export type MarkovResult = {
-  string: string,
-  score: number,
-  scorePerWord: number,
-  refs: Array<{ string: string }>
-}
-
-export type MarkovCorpusItem = {
-  words: any
-  refs: Array<{ string: string }>
-}
-
-export default class Markov {
+class Markov {
 
   public data: Array<{ string: string }>
   public startWords: MarkovCorpusItem[] = []
@@ -248,3 +226,5 @@ export default class Markov {
     }
   }
 }
+
+export = Markov

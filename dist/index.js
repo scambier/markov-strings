@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const debug = require("debug");
 const warn = debug("markov-strings:warning");
@@ -202,4 +201,4 @@ class Markov {
         }
     }
 }
-exports.default = Markov;
+module.exports = Markov;

@@ -1,7 +1,8 @@
 'use strict';
 
-const expect = require('chai').expect,
-  _ = require('lodash');
+const expect = require('chai').expect;
+const _ = require('lodash');
+const Generator = require('../dist/index');
 
 const data = [
   "Lorem ipsum dolor sit amet",
@@ -13,8 +14,6 @@ const data = [
   "fringilla dui avait annoncé une rupture avec le erat vel: il n'en est rien…",
   "Fusce tincidunt tempor, erat vel lacinia vel ex pharetra pretium lacinia imperdiet"
 ];
-
-const Generator = require('../dist/index');
 const generator = new Generator(data);
 
 beforeEach(function (done) {
@@ -208,9 +207,9 @@ describe('Sentence generator', function () {
 
   it('should reject all sentences because of the callback', function (done) {
     generator.generateSentence({
-        maxTries: 100,
-        checker: result => false
-      })
+      maxTries: 100,
+      checker: result => false
+    })
       .catch(e => {
         expect(e).to.be.an('error');
         done();
@@ -219,8 +218,8 @@ describe('Sentence generator', function () {
 
   it('should accept all sentences because of the callback', function (done) {
     generator.generateSentence({
-        checker: result => true
-      })
+      checker: result => true
+    })
       .then(result => {
         expect(result).to.exist;
         done();
@@ -229,8 +228,8 @@ describe('Sentence generator', function () {
 
   it('should return an object with all attributes', function (done) {
     generator.generateSentence({
-        checker: result => true
-      })
+      checker: result => true
+    })
       .then(result => {
         expect(result.string).to.exist;
         expect(result.score).to.exist;
