@@ -1,6 +1,7 @@
+import { assignIn, cloneDeep, flatten, includes, isString, sample, slice, some, uniqBy } from "lodash"
+
 import { MarkovCorpusItem, MarkovOptions, MarkovResult } from "./types"
 
-const _ = require("lodash")
 const debug = require("debug")
 const warn = debug("markov-strings:warning")
 
@@ -34,7 +35,7 @@ class Markov {
     this._checkOptions(options, "constructor")
 
     // Format data if necessary
-    if (_.isString(data[0])) {
+    if (isString(data[0])) {
       data = (data as string[]).map(s => ({ string: s }))
     } else if (!data[0].hasOwnProperty("string")) {
       throw new Error('Objects in your corpus must have a "string" property')
@@ -44,7 +45,7 @@ class Markov {
 
     // Save options
     this.options = this.defaultOptions
-    _.assignIn(this.options, options)
+    assignIn(this.options, options)
   }
 
   /**
@@ -74,27 +75,27 @@ class Markov {
       const stateSize = options.stateSize!
 
       // Start words
-      const start = _.slice(words, 0, stateSize).join(" ")
+      const start = slice(words, 0, stateSize).join(" ")
       const oldStartObj = this.startWords.find(o => o.words === start)
       if (oldStartObj) {
-        if (!_.includes(oldStartObj.refs, item)) { oldStartObj.refs.push(item) }
+        if (!includes(oldStartObj.refs, item)) { oldStartObj.refs.push(item) }
       } else {
         this.startWords.push({ words: start, refs: [item] })
       }
 
       // End words
-      const end = _.slice(words, words.length - stateSize, words.length).join(" ")
+      const end = slice(words, words.length - stateSize, words.length).join(" ")
       const oldEndObj = this.endWords.find(o => o.words === end)
       if (oldEndObj) {
-        if (!_.includes(oldEndObj.refs, item)) { oldEndObj.refs.push(item) }
+        if (!includes(oldEndObj.refs, item)) { oldEndObj.refs.push(item) }
       } else {
         this.endWords.push({ words: end, refs: [item] })
       }
 
       // Build corpus
       for (let i = 0; i < words.length - 1; i++) {
-        const curr = _.slice(words, i, i + stateSize).join(" ")
-        const next = _.slice(words, i + stateSize, i + stateSize * 2).join(" ")
+        const curr = slice(words, i, i + stateSize).join(" ")
+        const next = slice(words, i + stateSize, i + stateSize * 2).join(" ")
         if (!next || next.split(" ").length !== options.stateSize) {
           continue
         }
@@ -150,23 +151,23 @@ class Markov {
     this._checkOptions(options, "generateSentenceSync")
 
     const newOptions: MarkovOptions = {}
-    _.assignIn(newOptions, this.options, options)
+    assignIn(newOptions, this.options, options)
     options = newOptions
 
-    const corpus = _.cloneDeep(this.corpus)
+    const corpus = cloneDeep(this.corpus)
     const max = options.maxTries!
 
     // loop for maximum tries
     for (let i = 0; i < max; i++) {
       let ended = false
-      const arr = [_.sample(this.startWords)]
+      const arr = [sample(this.startWords)!]
       let score = 0
 
       // loop to build sentence
       let limit = 0
       while (limit < max) {
         const block = arr[arr.length - 1] // last value in array
-        const state = _.sample(corpus[block.words])
+        const state = sample(corpus[block.words])
 
         // sentence cannot be finished
         if (!state) {
@@ -180,7 +181,7 @@ class Markov {
         score += corpus[block.words].length - 1 // increment score
 
         // is sentence finished?
-        if (_.some(this.endWords, { words: state.words })) {
+        if (some(this.endWords, { words: state.words })) {
           ended = true
           break
         }
@@ -188,12 +189,12 @@ class Markov {
       }
       const scorePerWord = Math.ceil(score / arr.length)
 
-      const sentence = _.map(arr, "words").join(" ").trim()
+      const sentence = arr.map(o => o.words).join(" ").trim()
       const result = {
         string: sentence,
         score,
         scorePerWord,
-        refs: _.uniqBy(_.flatten(_.map(arr, "refs")), "string")
+        refs: uniqBy(flatten(arr.map(o => o.refs)), "string")
       }
 
       // sentence is not ended or incorrect

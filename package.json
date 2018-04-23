@@ -33,6 +33,7 @@
     "mocha": "^2.5.3"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.107",
     "debug": "^3.1.0",
     "lodash": "^4.13.1"
   }
