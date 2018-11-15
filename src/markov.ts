@@ -1,12 +1,26 @@
-import { assignIn, cloneDeep, flatten, includes, isString, sample, slice, some, uniqBy } from "lodash"
+import {
+  assignIn,
+  cloneDeep,
+  flatten,
+  includes,
+  isString,
+  sample,
+  slice,
+  some,
+  uniqBy
+} from 'lodash'
 
-import { MarkovCorpusItem, MarkovGenerateOptions, MarkovResult, MarkovConstructorOptions } from "./types"
+import {
+  MarkovConstructorOptions,
+  MarkovCorpusItem,
+  MarkovGenerateOptions,
+  MarkovResult
+} from './types'
 
-const debug = require("debug")
-const warn = debug("markov-strings:warning")
+const debug = require('debug')
+const warn = debug('markov-strings:warning')
 
 export default class Markov {
-
   public data: Array<{ string: string }>
   public startWords: MarkovCorpusItem[] = []
   public endWords: MarkovCorpusItem[] = []
@@ -24,15 +38,16 @@ export default class Markov {
    * @param {any} [options={}] An object of options. If not set, sensible defaults will be used.
    * @memberof Markov
    */
-  constructor(data: string[] | Array<{ string: string }>, options: MarkovConstructorOptions = {}) {
-
+  constructor(
+    data: string[] | Array<{ string: string }>,
+    options: MarkovConstructorOptions = {}
+  ) {
     // Format data if necessary
     if (isString(data[0])) {
       data = (data as string[]).map(s => ({ string: s }))
-    } else if (!data[0].hasOwnProperty("string")) {
+    } else if (!data[0].hasOwnProperty('string')) {
       throw new Error('Objects in your corpus must have a "string" property')
     }
-
     this.data = data as Array<{ string: string }>
 
     // Save options
@@ -63,32 +78,36 @@ export default class Markov {
     this.corpus = {}
     this.data.forEach(item => {
       const line = item.string
-      const words = line.split(" ")
+      const words = line.split(' ')
       const stateSize = options.stateSize!
 
       // Start words
-      const start = slice(words, 0, stateSize).join(" ")
+      const start = slice(words, 0, stateSize).join(' ')
       const oldStartObj = this.startWords.find(o => o.words === start)
       if (oldStartObj) {
-        if (!includes(oldStartObj.refs, item)) { oldStartObj.refs.push(item) }
+        if (!includes(oldStartObj.refs, item)) {
+          oldStartObj.refs.push(item)
+        }
       } else {
         this.startWords.push({ words: start, refs: [item] })
       }
 
       // End words
-      const end = slice(words, words.length - stateSize, words.length).join(" ")
+      const end = slice(words, words.length - stateSize, words.length).join(' ')
       const oldEndObj = this.endWords.find(o => o.words === end)
       if (oldEndObj) {
-        if (!includes(oldEndObj.refs, item)) { oldEndObj.refs.push(item) }
+        if (!includes(oldEndObj.refs, item)) {
+          oldEndObj.refs.push(item)
+        }
       } else {
         this.endWords.push({ words: end, refs: [item] })
       }
 
       // Build corpus
       for (let i = 0; i < words.length - 1; i++) {
-        const curr = slice(words, i, i + stateSize).join(" ")
-        const next = slice(words, i + stateSize, i + stateSize * 2).join(" ")
-        if (!next || next.split(" ").length !== options.stateSize) {
+        const curr = slice(words, i, i + stateSize).join(' ')
+        const next = slice(words, i + stateSize, i + stateSize * 2).join(' ')
+        if (!next || next.split(' ').length !== options.stateSize) {
           continue
         }
 
@@ -115,7 +134,9 @@ export default class Markov {
    * @returns {Promise<MarkovResult>}
    * @memberof Markov
    */
-  public generateSentenceAsync(options: MarkovGenerateOptions): Promise<MarkovResult> {
+  public generateSentenceAsync(
+    options: MarkovGenerateOptions
+  ): Promise<MarkovResult> {
     return new Promise((resolve, reject) => {
       try {
         const result = this.generateSentence(options)
@@ -135,7 +156,7 @@ export default class Markov {
    */
   public generateSentence(options: MarkovGenerateOptions = {}): MarkovResult {
     if (!this.corpus) {
-      throw new Error("Corpus is not built.")
+      throw new Error('Corpus is not built.')
     }
 
     const newOptions: MarkovGenerateOptions = {}
@@ -177,28 +198,38 @@ export default class Markov {
       }
       const scorePerWord = Math.ceil(score / arr.length)
 
-      const sentence = arr.map(o => o.words).join(" ").trim()
+      const sentence = arr
+        .map(o => o.words)
+        .join(' ')
+        .trim()
       const result = {
         string: sentence,
         score,
         scorePerWord,
-        refs: uniqBy(flatten(arr.map(o => o.refs)), "string")
+        refs: uniqBy(flatten(arr.map(o => o.refs)), 'string')
       }
 
       // sentence is not ended or incorrect
-      if (!ended ||
-        typeof options.filter === "function" && !options.filter(result) ||
-        options.minWords && options.minWords > 0 && sentence.split(" ").length < options.minWords ||
-        options.maxWords && options.maxWords > 0 && sentence.split(" ").length > options.maxWords ||
-        options.maxLength && options.maxLength > 0 && sentence.length > options.maxLength ||
-        options.minScore && score < options.minScore ||
-        options.minScorePerWord && scorePerWord < options.minScorePerWord
+      if (
+        !ended ||
+        (typeof options.filter === 'function' && !options.filter(result)) ||
+        (options.minWords &&
+          options.minWords > 0 &&
+          sentence.split(' ').length < options.minWords) ||
+        (options.maxWords &&
+          options.maxWords > 0 &&
+          sentence.split(' ').length > options.maxWords) ||
+        (options.maxLength &&
+          options.maxLength > 0 &&
+          sentence.length > options.maxLength) ||
+        (options.minScore && score < options.minScore) ||
+        (options.minScorePerWord && scorePerWord < options.minScorePerWord)
       ) {
         continue
       }
 
       return result
     }
-    throw new Error("Cannot build sentence with current corpus and options")
+    throw new Error('Cannot build sentence with current corpus and options')
   }
 }
