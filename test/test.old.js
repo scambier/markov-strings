@@ -26,6 +26,13 @@ describe('Options parser', function () {
   });
 });
 
+describe('Constructor', function() {
+  it('should save stateSize', function() {
+    const generator = new Generator(data, {stateSize: 3})
+    expect(generator.stateSize).to.equal(3)
+  })
+})
+
 describe('In buildCorpus', function () {
 
   describe('StartWords array', function () {

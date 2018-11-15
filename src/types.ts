@@ -1,14 +1,16 @@
 
-export type MarkovOptions = {
-  stateSize?: number
+export type MarkovGenerateOptions = {
   maxLength?: number
   minWords?: number
   maxWords?: number
   minScore?: number
   minScorePerWord?: number
   maxTries?: number
-  checker?: (result: string) => boolean
   filter?: (result: MarkovResult) => boolean
+}
+
+export type MarkovConstructorOptions = {
+  stateSize?: number
 }
 
 export type MarkovResult = {

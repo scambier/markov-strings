@@ -1,27 +1,20 @@
 import { assignIn, cloneDeep, flatten, includes, isString, sample, slice, some, uniqBy } from "lodash"
 
-import { MarkovCorpusItem, MarkovOptions, MarkovResult } from "./types"
+import { MarkovCorpusItem, MarkovGenerateOptions, MarkovResult, MarkovConstructorOptions } from "./types"
 
 const debug = require("debug")
 const warn = debug("markov-strings:warning")
 
-class Markov {
+export default class Markov {
 
   public data: Array<{ string: string }>
   public startWords: MarkovCorpusItem[] = []
   public endWords: MarkovCorpusItem[] = []
   public corpus: { [key: string]: MarkovCorpusItem[] } = {}
-  public options: MarkovOptions
-  private defaultOptions: MarkovOptions = {
-    stateSize: 2,
-    maxLength: 0,
-    minWords: 0,
-    maxWords: 0,
-    minScore: 0,
-    minScorePerWord: 0,
-    maxTries: 10000,
-    checker: undefined,
-    filter: undefined
+  public options: MarkovConstructorOptions
+
+  private defaultOptions: MarkovConstructorOptions = {
+    stateSize: 2
   }
 
   /**
@@ -31,8 +24,7 @@ class Markov {
    * @param {any} [options={}] An object of options. If not set, sensible defaults will be used.
    * @memberof Markov
    */
-  constructor(data: string[] | Array<{ string: string }>, options: MarkovOptions = {}) {
-    this._checkOptions(options, "constructor")
+  constructor(data: string[] | Array<{ string: string }>, options: MarkovConstructorOptions = {}) {
 
     // Format data if necessary
     if (isString(data[0])) {
@@ -54,9 +46,9 @@ class Markov {
    * @returns {Promise<void>}
    * @memberof Markov
    */
-  public buildCorpus(): Promise<void> {
+  public buildCorpusAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
-      resolve(this.buildCorpusSync())
+      resolve(this.buildCorpus())
     })
   }
 
@@ -65,7 +57,7 @@ class Markov {
    *
    * @memberof Markov
    */
-  public buildCorpusSync(): void {
+  public buildCorpus(): void {
     const options = this.options
 
     this.corpus = {}
@@ -119,16 +111,14 @@ class Markov {
   /**
    * Generates a result, that contains a string and its references
    *
-   * @param {MarkovOptions} options
+   * @param {MarkovGenerateOptions} options
    * @returns {Promise<MarkovResult>}
    * @memberof Markov
    */
-  public generateSentence(options: MarkovOptions): Promise<MarkovResult> {
-    this._checkOptions(options, "generateSentence")
-
+  public generateSentenceAsync(options: MarkovGenerateOptions): Promise<MarkovResult> {
     return new Promise((resolve, reject) => {
       try {
-        const result = this.generateSentenceSync(options)
+        const result = this.generateSentence(options)
         resolve(result)
       } catch (e) {
         reject(e)
@@ -139,18 +129,16 @@ class Markov {
   /**
    * Generates a result, that contains a string and its references (synced method)
    *
-   * @param {MarkovOptions} [options={}]
+   * @param {MarkovGenerateOptions} [options={}]
    * @returns {MarkovResult}
    * @memberof Markov
    */
-  public generateSentenceSync(options: MarkovOptions = {}): MarkovResult {
+  public generateSentence(options: MarkovGenerateOptions = {}): MarkovResult {
     if (!this.corpus) {
       throw new Error("Corpus is not built.")
     }
 
-    this._checkOptions(options, "generateSentenceSync")
-
-    const newOptions: MarkovOptions = {}
+    const newOptions: MarkovGenerateOptions = {}
     assignIn(newOptions, this.options, options)
     options = newOptions
 
@@ -199,7 +187,6 @@ class Markov {
 
       // sentence is not ended or incorrect
       if (!ended ||
-        typeof options.checker === "function" && !options.checker(sentence) || // checker cb returns false
         typeof options.filter === "function" && !options.filter(result) ||
         options.minWords && options.minWords > 0 && sentence.split(" ").length < options.minWords ||
         options.maxWords && options.maxWords > 0 && sentence.split(" ").length > options.maxWords ||
@@ -214,18 +201,4 @@ class Markov {
     }
     throw new Error("Cannot build sentence with current corpus and options")
   }
-
-  private _checkOptions(options: MarkovOptions, methodName: string): void {
-    if (options && typeof options.checker !== "undefined") {
-      warn(
-        `You've passed an 'options' object with 'checker' ` +
-        `property set to 'MarkovGenerator.${methodName}'. ` +
-        `'checker(sentence)' property is deprecated and will be removed ` +
-        `in future versions of the library. ` +
-        `Please use 'filter(result)' property instead.`
-      )
-    }
-  }
 }
-
-export = Markov
