@@ -1,13 +1,15 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
-const debug = require("debug");
-const warn = debug("markov-strings:warning");
+const debug = require('debug');
+const warn = debug('markov-strings:warning');
 class Markov {
     /**
      * Creates an instance of Markov generator.
+     *
      * @param {(string[] | Array<{ string: string }>)} data An array of strings or objects.
      * If 'data' is an array of objects, each object must have a 'string' attribute
-     * @param {any} [options={}] An object of options. If not set, sensible defaults will be used.
+     * @param {MarkovConstructorOptions} [options={}]
      * @memberof Markov
      */
     constructor(data, options = {}) {
@@ -15,22 +17,13 @@ class Markov {
         this.endWords = [];
         this.corpus = {};
         this.defaultOptions = {
-            stateSize: 2,
-            maxLength: 0,
-            minWords: 0,
-            maxWords: 0,
-            minScore: 0,
-            minScorePerWord: 0,
-            maxTries: 10000,
-            checker: undefined,
-            filter: undefined
+            stateSize: 2
         };
-        this._checkOptions(options, "constructor");
         // Format data if necessary
         if (lodash_1.isString(data[0])) {
             data = data.map(s => ({ string: s }));
         }
-        else if (!data[0].hasOwnProperty("string")) {
+        else if (!data[0].hasOwnProperty('string')) {
             throw new Error('Objects in your corpus must have a "string" property');
         }
         this.data = data;
@@ -39,30 +32,18 @@ class Markov {
         lodash_1.assignIn(this.options, options);
     }
     /**
-     * Builds the corpus
+     * Builds the corpus. You must call this before generating sentences.
      *
-     * @returns {Promise<void>}
      * @memberof Markov
      */
     buildCorpus() {
-        return new Promise((resolve, reject) => {
-            resolve(this.buildCorpusSync());
-        });
-    }
-    /**
-     * Builds the corpus (synced method)
-     *
-     * @memberof Markov
-     */
-    buildCorpusSync() {
         const options = this.options;
-        this.corpus = {};
         this.data.forEach(item => {
             const line = item.string;
-            const words = line.split(" ");
-            const stateSize = options.stateSize;
+            const words = line.split(' ');
+            const stateSize = options.stateSize; // Default value of 2 is set in the constructor
             // Start words
-            const start = lodash_1.slice(words, 0, stateSize).join(" ");
+            const start = lodash_1.slice(words, 0, stateSize).join(' ');
             const oldStartObj = this.startWords.find(o => o.words === start);
             if (oldStartObj) {
                 if (!lodash_1.includes(oldStartObj.refs, item)) {
@@ -73,7 +54,7 @@ class Markov {
                 this.startWords.push({ words: start, refs: [item] });
             }
             // End words
-            const end = lodash_1.slice(words, words.length - stateSize, words.length).join(" ");
+            const end = lodash_1.slice(words, words.length - stateSize, words.length).join(' ');
             const oldEndObj = this.endWords.find(o => o.words === end);
             if (oldEndObj) {
                 if (!lodash_1.includes(oldEndObj.refs, item)) {
@@ -85,9 +66,9 @@ class Markov {
             }
             // Build corpus
             for (let i = 0; i < words.length - 1; i++) {
-                const curr = lodash_1.slice(words, i, i + stateSize).join(" ");
-                const next = lodash_1.slice(words, i + stateSize, i + stateSize * 2).join(" ");
-                if (!next || next.split(" ").length !== options.stateSize) {
+                const curr = lodash_1.slice(words, i, i + stateSize).join(' ');
+                const next = lodash_1.slice(words, i + stateSize, i + stateSize * 2).join(' ');
+                if (!next || next.split(' ').length !== options.stateSize) {
                     continue;
                 }
                 // add block to corpus
@@ -108,18 +89,16 @@ class Markov {
         });
     }
     /**
-     * Generates a result, that contains a string and its references
+     * `.buildCorpus()` wrapped inside a Promise
      *
-     * @param {MarkovOptions} options
-     * @returns {Promise<MarkovResult>}
+     * @returns {Promise<void>}
      * @memberof Markov
      */
-    generateSentence(options) {
-        this._checkOptions(options, "generateSentence");
+    buildCorpusAsync() {
         return new Promise((resolve, reject) => {
             try {
-                const result = this.generateSentenceSync(options);
-                resolve(result);
+                this.buildCorpus();
+                resolve();
             }
             catch (e) {
                 reject(e);
@@ -127,33 +106,31 @@ class Markov {
         });
     }
     /**
-     * Generates a result, that contains a string and its references (synced method)
+     * Generates a result, that contains a string and its references
      *
-     * @param {MarkovOptions} [options={}]
+     * @param {MarkovGenerateOptions} [options={}]
      * @returns {MarkovResult}
      * @memberof Markov
      */
-    generateSentenceSync(options = {}) {
-        if (!this.corpus) {
-            throw new Error("Corpus is not built.");
+    generate(options = {}) {
+        if (lodash_1.isEmpty(this.corpus)) {
+            throw new Error('Corpus is not built');
         }
-        this._checkOptions(options, "generateSentenceSync");
-        const newOptions = {};
-        lodash_1.assignIn(newOptions, this.options, options);
-        options = newOptions;
         const corpus = lodash_1.cloneDeep(this.corpus);
-        const max = options.maxTries;
-        // loop for maximum tries
-        for (let i = 0; i < max; i++) {
+        const maxTries = options.maxTries ? options.maxTries : 10;
+        let tries;
+        // We loop through fragments to create a complete sentence
+        for (tries = 1; tries <= maxTries; tries++) {
             let ended = false;
+            // Create an array of MarkovCorpusItems
+            // The first item is a random startWords element
             const arr = [lodash_1.sample(this.startWords)];
             let score = 0;
-            // loop to build sentence
-            let limit = 0;
-            while (limit < max) {
+            // loop to build a complete sentence
+            for (let innerTries = 0; innerTries < maxTries; innerTries++) {
                 const block = arr[arr.length - 1]; // last value in array
-                const state = lodash_1.sample(corpus[block.words]);
-                // sentence cannot be finished
+                const state = lodash_1.sample(corpus[block.words]); // Find a following item in the corpus
+                // If a state cannot be found, the sentence can't be completed
                 if (!state) {
                     break;
                 }
@@ -166,39 +143,42 @@ class Markov {
                     ended = true;
                     break;
                 }
-                limit++;
             }
-            const scorePerWord = Math.ceil(score / arr.length);
-            const sentence = arr.map(o => o.words).join(" ").trim();
+            const sentence = arr
+                .map(o => o.words)
+                .join(' ')
+                .trim();
             const result = {
                 string: sentence,
                 score,
-                scorePerWord,
-                refs: lodash_1.uniqBy(lodash_1.flatten(arr.map(o => o.refs)), "string")
+                refs: lodash_1.uniqBy(lodash_1.flatten(arr.map(o => o.refs)), 'string'),
+                tries
             };
             // sentence is not ended or incorrect
-            if (!ended ||
-                typeof options.checker === "function" && !options.checker(sentence) || // checker cb returns false
-                typeof options.filter === "function" && !options.filter(result) ||
-                options.minWords && options.minWords > 0 && sentence.split(" ").length < options.minWords ||
-                options.maxWords && options.maxWords > 0 && sentence.split(" ").length > options.maxWords ||
-                options.maxLength && options.maxLength > 0 && sentence.length > options.maxLength ||
-                options.minScore && score < options.minScore ||
-                options.minScorePerWord && scorePerWord < options.minScorePerWord) {
+            if (!ended || (typeof options.filter === 'function' && !options.filter(result))) {
                 continue;
             }
             return result;
         }
-        throw new Error("Cannot build sentence with current corpus and options");
+        throw new Error(`Failed to build a sentence after ${tries - 1} tries`);
     }
-    _checkOptions(options, methodName) {
-        if (options && typeof options.checker !== "undefined") {
-            warn(`You've passed an 'options' object with 'checker' ` +
-                `property set to 'MarkovGenerator.${methodName}'. ` +
-                `'checker(sentence)' property is deprecated and will be removed ` +
-                `in future versions of the library. ` +
-                `Please use 'filter(result)' property instead.`);
-        }
+    /**
+     * `.generate()` wrapped inside a Promise
+     *
+     * @param {MarkovGenerateOptions} options
+     * @returns {Promise<MarkovResult>}
+     * @memberof Markov
+     */
+    generateAsync(options = {}) {
+        return new Promise((resolve, reject) => {
+            try {
+                const result = this.generate(options);
+                resolve(result);
+            }
+            catch (e) {
+                reject(e);
+            }
+        });
     }
 }
-module.exports = Markov;
+exports.default = Markov;

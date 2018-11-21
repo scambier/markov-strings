@@ -1,5 +1,27 @@
 import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, sample, slice, some, uniqBy } from 'lodash'
-import { Corpus, MarkovConstructorOptions, MarkovFragment, MarkovGenerateOptions, MarkovResult } from './types'
+
+export type MarkovGenerateOptions = {
+  maxTries?: number
+  filter?: (result: MarkovResult) => boolean
+}
+
+export type MarkovConstructorOptions = {
+  stateSize?: number
+}
+
+export type MarkovResult = {
+  string: string,
+  score: number,
+  refs: Array<{ string: string }>,
+  tries: number
+}
+
+export type MarkovFragment = {
+  words: string
+  refs: Array<{ string: string }>
+}
+
+export type Corpus = { [key: string]: MarkovFragment[] }
 
 const debug = require('debug')
 const warn = debug('markov-strings:warning')

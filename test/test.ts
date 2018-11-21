@@ -1,5 +1,5 @@
 import { map, some } from 'lodash'
-import Markov from '../src/markov'
+import Markov from '../src'
 import { MarkovResult } from '../src/types'
 
 const data = [
