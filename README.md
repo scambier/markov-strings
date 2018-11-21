@@ -57,7 +57,6 @@ console.log(result)
 {
   string: 'lorem ipsum dolor sit amet etc.',
   score: 42,
-  scorePerWord: 7,
   tries: 5,
   refs: [ an array of objects ]
 }
@@ -103,17 +102,16 @@ Since `.buildCorpus()` can take some time, a non-blocking variant `.buildCorpusA
 
 ### .generate([options])
 
-Returns an object of type:
+Returns an object of type `MarkovResult`:
 
 ```js
 {
-  string: string,
-  score: number,
-  refs: Array<{ string: string }>,
-  tries: number
+  string: string, // The resulting sentence
+  score: number,  // A relative "score" based on the number of possible permutations. Higher is "better", but the actual value depends on your corpus
+  refs: Array<{ string: string }>, // The array of references used to build the sentence
+  tries: number   // The number of tries it took to output this result
 }
 ```
-
 
 The `refs` array will contain all objects that have been used to build the sentence. May be useful to fetch some meta data or make some stats.
 
@@ -121,10 +119,9 @@ The `refs` array will contain all objects that have been used to build the sente
 
 ```js
 {
-  maxTries: number
-  filter: (result: MarkovResult) => boolean
+  maxTries: number // The max number of tentatives before giving up (default is 10)
+  filter: (result: MarkovResult) => boolean // A callback to filter results (see example above)
 }
-
 ```
 
 ## Changelog
