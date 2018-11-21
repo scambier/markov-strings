@@ -1,23 +1,5 @@
-import {
-  assignIn,
-  cloneDeep,
-  flatten,
-  includes,
-  isEmpty,
-  isString,
-  sample,
-  slice,
-  some,
-  uniqBy
-} from 'lodash'
-
-import {
-  Corpus,
-  MarkovConstructorOptions,
-  MarkovFragment,
-  MarkovGenerateOptions,
-  MarkovResult
-} from './types'
+import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, sample, slice, some, uniqBy } from 'lodash'
+import { Corpus, MarkovConstructorOptions, MarkovFragment, MarkovGenerateOptions, MarkovResult } from './types'
 
 const debug = require('debug')
 const warn = debug('markov-strings:warning')
@@ -41,10 +23,7 @@ export default class Markov {
    * @param {MarkovConstructorOptions} [options={}]
    * @memberof Markov
    */
-  constructor(
-    data: string[] | Array<{ string: string }>,
-    options: MarkovConstructorOptions = {}
-  ) {
+  constructor(data: string[] | Array<{ string: string }>, options: MarkovConstructorOptions = {}) {
     // Format data if necessary
     if (isString(data[0])) {
       data = (data as string[]).map(s => ({ string: s }))
@@ -203,10 +182,7 @@ export default class Markov {
       }
 
       // sentence is not ended or incorrect
-      if (
-        !ended ||
-        (typeof options.filter === 'function' && !options.filter(result))
-      ) {
+      if (!ended || (typeof options.filter === 'function' && !options.filter(result))) {
         continue
       }
 
@@ -222,9 +198,7 @@ export default class Markov {
    * @returns {Promise<MarkovResult>}
    * @memberof Markov
    */
-  public generateSentenceAsync(
-    options: MarkovGenerateOptions = {}
-  ): Promise<MarkovResult> {
+  public generateSentenceAsync(options: MarkovGenerateOptions = {}): Promise<MarkovResult> {
     return new Promise((resolve, reject) => {
       try {
         const result = this.generateSentence(options)
