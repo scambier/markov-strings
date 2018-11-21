@@ -1,6 +1,5 @@
 import { map, some } from 'lodash'
-import Markov from '../src'
-import { MarkovResult } from '../src/types'
+import Markov, { MarkovResult } from '../src'
 
 const data = [
   'Lorem ipsum dolor sit amet',
@@ -133,8 +132,8 @@ describe('Markov class', () => {
       expect.assertions(10)
 
       for (let i = 0; i < 10; i++) {
-        const sentence = markov.generate({ maxTries: 5 })
-        expect(sentence.tries).toBeLessThanOrEqual(5)
+        const sentence = markov.generate({ maxTries: 20 })
+        expect(sentence.tries).toBeLessThanOrEqual(20)
       }
     })
 
