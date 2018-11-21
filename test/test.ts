@@ -1,4 +1,4 @@
-import { some } from 'lodash'
+import { map, some } from 'lodash'
 import Markov from '../src/markov'
 import { MarkovResult } from '../src/types'
 
@@ -42,11 +42,10 @@ describe('Markov class', () => {
     })
 
     it('should build asynchronously', async () => {
-      expect.assertions(2)
       const markov = new Markov(data)
-      expect(markov.corpus).toEqual({})
+      markov.buildCorpus = jest.fn()
       await markov.buildCorpusAsync()
-      expect(markov.corpus).not.toEqual({})
+      expect(markov.buildCorpus).toHaveBeenCalled()
     })
   })
 
@@ -117,6 +116,12 @@ describe('Markov class', () => {
       markov.buildCorpus()
     })
 
+    it('should generate asynchronously', async () => {
+      markov.generateSentence = jest.fn()
+      await markov.generateSentenceAsync()
+      expect(markov.generateSentence).toHaveBeenCalled()
+    })
+
     it('should throw an error if the corpus is not built', () => {
       markov = new Markov(data)
       expect(() => {
@@ -125,8 +130,18 @@ describe('Markov class', () => {
     })
 
     it('should return a result if under the tries limit', () => {
-      const sentence = markov.generateSentence({maxTries: 5})
-      expect(sentence.tries).toBeLessThanOrEqual(5)
+      expect.assertions(10)
+
+      for (let i = 0; i < 10; i++) {
+        const sentence = markov.generateSentence({ maxTries: 5 })
+        expect(sentence.tries).toBeLessThanOrEqual(5)
+      }
+    })
+
+    it('should call the `filter` callback', () => {
+      const filter = jest.fn(x => true)
+      markov.generateSentence({ filter })
+      expect(filter).toHaveBeenCalled()
     })
 
     it('should throw an error after 10 tries, by default', () => {
@@ -139,10 +154,36 @@ describe('Markov class', () => {
       }).toThrowError('10')
     })
 
-    it('should generate asynchronously', async () => {
-      markov.generateSentence = jest.fn()
-      await markov.generateSentenceAsync()
-      expect(markov.generateSentence).toHaveBeenCalled()
+    it('should end with a value from endWords', async () => {
+      expect.assertions(10)
+
+      for (let i = 0; i < 10; i++) {
+        const result = await markov.generateSentence()
+        const arr = result.string.split(' ')
+        const end = arr.slice(arr.length - 2, arr.length)
+        expect(map(markov.endWords, 'words')).toContain(end.join(' '))
+      }
     })
+
+    it(`should pass the result object to 'filter(result)'`, async () => {
+      expect.assertions(7)
+
+      const options = {
+        minWords: 5,
+        maxTries: 10,
+        filter: (result: MarkovResult): boolean => {
+          expect(Object.keys(result)).toHaveLength(5)
+          expect(result).toHaveProperty('string')
+          expect(result).toHaveProperty('score')
+          expect(result).toHaveProperty('scorePerWord')
+          expect(result).toHaveProperty('refs')
+          expect(Array.isArray(result.refs)).toBeTruthy()
+          expect(result).toHaveProperty('tries')
+          return true
+        }
+      }
+      markov.generateSentence(options)
+    })
+
   })
 })
