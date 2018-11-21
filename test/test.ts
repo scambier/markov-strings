@@ -1,5 +1,6 @@
 import { some } from 'lodash'
 import Markov from '../src/markov'
+import { MarkovResult } from '../src/types'
 
 const data = [
   'Lorem ipsum dolor sit amet',
@@ -8,40 +9,55 @@ const data = [
   'Quisque tempor, erat vel lacinia imperdiet',
   'Justo nisi fringilla dui',
   'Egestas bibendum eros nisi ut lacus',
-  'fringilla dui avait annoncé une rupture avec le erat vel: il n\'en est rien…',
+  "fringilla dui avait annoncé une rupture avec le erat vel: il n'en est rien…",
   'Fusce tincidunt tempor, erat vel lacinia vel ex pharetra pretium lacinia imperdiet'
 ]
 
 describe('Markov class', () => {
-
-  let markov: Markov
-  beforeEach(() => {
-    markov = new Markov(data)
-    markov.buildCorpus()
-  })
-
   describe('Constructor', () => {
     it('should throw an error if corpus is invalid', () => {
       expect(() => {
         // @ts-ignore
-        markov = new Markov([{}])
+        const markov = new Markov([{}])
       }).toThrowError()
     })
 
     it('should have a default stateSize', () => {
-      markov = new Markov(data)
+      const markov = new Markov(data)
       expect(markov.options.stateSize).toBe(2)
     })
 
     it('should save a different stateSize', () => {
-      markov = new Markov(data, { stateSize: 3 })
+      const markov = new Markov(data, { stateSize: 3 })
       expect(markov.options.stateSize).toBe(3)
     })
   })
 
-  describe('After building the corpus', () => {
-    describe('The startWords array', () => {
+  describe('Build the corpus', () => {
+    it('should build synchronously', () => {
+      const markov = new Markov(data)
+      expect(markov.corpus).toEqual({})
+      markov.buildCorpus()
+      expect(markov.corpus).not.toEqual({})
+    })
 
+    it('should build asynchronously', async () => {
+      expect.assertions(2)
+      const markov = new Markov(data)
+      expect(markov.corpus).toEqual({})
+      await markov.buildCorpusAsync()
+      expect(markov.corpus).not.toEqual({})
+    })
+  })
+
+  describe('After building the corpus', () => {
+    let markov: Markov
+    beforeEach(() => {
+      markov = new Markov(data)
+      markov.buildCorpus()
+    })
+
+    describe('The startWords array', () => {
       it('should contain the right values', () => {
         const start = markov.startWords
         expect(some(start, { words: 'Lorem ipsum' })).toBeTruthy()
@@ -76,13 +92,57 @@ describe('Markov class', () => {
   })
 
   describe('The corpus itself', () => {
+    let markov: Markov
+    beforeEach(() => {
+      markov = new Markov(data)
+      markov.buildCorpus()
+    })
+
     it('should have the right values for the right keys', () => {
       const corpus = markov.corpus
       expect(some(corpus['Lorem ipsum'], { words: 'dolor sit' })).toBeTruthy()
-      expect(some(corpus['Lorem ipsum'], { words: 'duplicate start' })).toBeTruthy()
-      expect(some(corpus['tempor, erat'], { words: 'vel lacinia' })).toBeTruthy()
+      expect(
+        some(corpus['Lorem ipsum'], { words: 'duplicate start' })
+      ).toBeTruthy()
+      expect(
+        some(corpus['tempor, erat'], { words: 'vel lacinia' })
+      ).toBeTruthy()
     })
   })
 
-  describe('generateSentence', () => {})
+  describe('The sentence generation', () => {
+    let markov: Markov
+    beforeEach(() => {
+      markov = new Markov(data)
+      markov.buildCorpus()
+    })
+
+    it('should throw an error if the corpus is not built', () => {
+      markov = new Markov(data)
+      expect(() => {
+        markov.generateSentence()
+      }).toThrowError('Corpus is not built')
+    })
+
+    it('should return a result if under the tries limit', () => {
+      const sentence = markov.generateSentence({maxTries: 5})
+      expect(sentence.tries).toBeLessThanOrEqual(5)
+    })
+
+    it('should throw an error after 10 tries, by default', () => {
+      expect(() => {
+        markov.generateSentence({
+          filter(result: MarkovResult): boolean {
+            return false
+          }
+        })
+      }).toThrowError('10')
+    })
+
+    it('should generate asynchronously', async () => {
+      markov.generateSentence = jest.fn()
+      await markov.generateSentenceAsync()
+      expect(markov.generateSentence).toHaveBeenCalled()
+    })
+  })
 })

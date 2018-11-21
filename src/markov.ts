@@ -3,6 +3,7 @@ import {
   cloneDeep,
   flatten,
   includes,
+  isEmpty,
   isString,
   sample,
   slice,
@@ -11,8 +12,9 @@ import {
 } from 'lodash'
 
 import {
+  Corpus,
   MarkovConstructorOptions,
-  MarkovCorpusItem,
+  MarkovFragment,
   MarkovGenerateOptions,
   MarkovResult
 } from './types'
@@ -22,9 +24,9 @@ const warn = debug('markov-strings:warning')
 
 export default class Markov {
   public data: Array<{ string: string }>
-  public startWords: MarkovCorpusItem[] = []
-  public endWords: MarkovCorpusItem[] = []
-  public corpus: { [key: string]: MarkovCorpusItem[] } = {}
+  public startWords: MarkovFragment[] = []
+  public endWords: MarkovFragment[] = []
+  public corpus: Corpus = {}
   public options: MarkovConstructorOptions
 
   private defaultOptions: MarkovConstructorOptions = {
@@ -33,9 +35,10 @@ export default class Markov {
 
   /**
    * Creates an instance of Markov generator.
+   *
    * @param {(string[] | Array<{ string: string }>)} data An array of strings or objects.
    * If 'data' is an array of objects, each object must have a 'string' attribute
-   * @param {any} [options={}] An object of options. If not set, sensible defaults will be used.
+   * @param {MarkovConstructorOptions} [options={}]
    * @memberof Markov
    */
   constructor(
@@ -56,30 +59,17 @@ export default class Markov {
   }
 
   /**
-   * Builds the corpus
-   *
-   * @returns {Promise<void>}
-   * @memberof Markov
-   */
-  public buildCorpusAsync(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      resolve(this.buildCorpus())
-    })
-  }
-
-  /**
-   * Builds the corpus (synced method)
+   * Builds the corpus. You must call this before generating sentences.
    *
    * @memberof Markov
    */
   public buildCorpus(): void {
     const options = this.options
 
-    this.corpus = {}
     this.data.forEach(item => {
       const line = item.string
       const words = line.split(' ')
-      const stateSize = options.stateSize!
+      const stateSize = options.stateSize! // Default value of 2 is set in the constructor
 
       // Start words
       const start = slice(words, 0, stateSize).join(' ')
@@ -128,19 +118,16 @@ export default class Markov {
   }
 
   /**
-   * Generates a result, that contains a string and its references
+   * `.buildCorpus()` wrapped inside a Promise
    *
-   * @param {MarkovGenerateOptions} options
-   * @returns {Promise<MarkovResult>}
+   * @returns {Promise<void>}
    * @memberof Markov
    */
-  public generateSentenceAsync(
-    options: MarkovGenerateOptions
-  ): Promise<MarkovResult> {
+  public buildCorpusAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        const result = this.generateSentence(options)
-        resolve(result)
+        this.buildCorpus()
+        resolve()
       } catch (e) {
         reject(e)
       }
@@ -148,37 +135,42 @@ export default class Markov {
   }
 
   /**
-   * Generates a result, that contains a string and its references (synced method)
+   * Generates a result, that contains a string and its references
    *
    * @param {MarkovGenerateOptions} [options={}]
    * @returns {MarkovResult}
    * @memberof Markov
    */
   public generateSentence(options: MarkovGenerateOptions = {}): MarkovResult {
-    if (!this.corpus) {
-      throw new Error('Corpus is not built.')
+    if (isEmpty(this.corpus)) {
+      throw new Error('Corpus is not built')
     }
 
-    const newOptions: MarkovGenerateOptions = {}
-    assignIn(newOptions, this.options, options)
-    options = newOptions
+    // const newOptions: MarkovGenerateOptions = {}
+    // assignIn(newOptions, this.options, options)
+    // options = newOptions
 
     const corpus = cloneDeep(this.corpus)
-    const max = options.maxTries!
+    const maxTries = options.maxTries ? options.maxTries : 10
 
-    // loop for maximum tries
-    for (let i = 0; i < max; i++) {
+    let tries: number
+
+    // We loop through fragments to create a complete sentence
+    for (tries = 1; tries <= maxTries; tries++) {
       let ended = false
+
+      // Create an array of MarkovCorpusItems
+      // The first item is a random startWords element
       const arr = [sample(this.startWords)!]
+
       let score = 0
 
-      // loop to build sentence
-      let limit = 0
-      while (limit < max) {
+      // loop to build a complete sentence
+      for (let innerTries = 0; innerTries < maxTries; innerTries++) {
         const block = arr[arr.length - 1] // last value in array
-        const state = sample(corpus[block.words])
+        const state = sample(corpus[block.words]) // Find a following item in the corpus
 
-        // sentence cannot be finished
+        // If a state cannot be found, the sentence can't be completed
         if (!state) {
           break
         }
@@ -194,7 +186,6 @@ export default class Markov {
           ended = true
           break
         }
-        limit++
       }
       const scorePerWord = Math.ceil(score / arr.length)
 
@@ -202,34 +193,45 @@ export default class Markov {
         .map(o => o.words)
         .join(' ')
         .trim()
+
       const result = {
         string: sentence,
         score,
         scorePerWord,
-        refs: uniqBy(flatten(arr.map(o => o.refs)), 'string')
+        refs: uniqBy(flatten(arr.map(o => o.refs)), 'string'),
+        tries
       }
 
       // sentence is not ended or incorrect
       if (
         !ended ||
-        (typeof options.filter === 'function' && !options.filter(result)) ||
-        (options.minWords &&
-          options.minWords > 0 &&
-          sentence.split(' ').length < options.minWords) ||
-        (options.maxWords &&
-          options.maxWords > 0 &&
-          sentence.split(' ').length > options.maxWords) ||
-        (options.maxLength &&
-          options.maxLength > 0 &&
-          sentence.length > options.maxLength) ||
-        (options.minScore && score < options.minScore) ||
-        (options.minScorePerWord && scorePerWord < options.minScorePerWord)
+        (typeof options.filter === 'function' && !options.filter(result))
       ) {
         continue
       }
 
       return result
     }
-    throw new Error('Cannot build sentence with current corpus and options')
+    throw new Error(`Failed to build a sentence after ${tries - 1} tries`)
+  }
+
+  /**
+   * `.generateSentence()` wrapped inside a Promise
+   *
+   * @param {MarkovGenerateOptions} options
+   * @returns {Promise<MarkovResult>}
+   * @memberof Markov
+   */
+  public generateSentenceAsync(
+    options: MarkovGenerateOptions = {}
+  ): Promise<MarkovResult> {
+    return new Promise((resolve, reject) => {
+      try {
+        const result = this.generateSentence(options)
+        resolve(result)
+      } catch (e) {
+        reject(e)
+      }
+    })
   }
 }
