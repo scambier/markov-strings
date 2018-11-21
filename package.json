@@ -1,6 +1,6 @@
 {
   "name": "markov-strings",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A Markov string generator",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
     "test:coveralls": "jest --coverageReporters=text-lcov | coveralls"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=8.0.0"
   },
   "repository": {
     "type": "git",
