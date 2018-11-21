@@ -117,15 +117,15 @@ describe('Markov class', () => {
     })
 
     it('should generate asynchronously', async () => {
-      markov.generateSentence = jest.fn()
-      await markov.generateSentenceAsync()
-      expect(markov.generateSentence).toHaveBeenCalled()
+      markov.generate = jest.fn()
+      await markov.generateAsync()
+      expect(markov.generate).toHaveBeenCalled()
     })
 
     it('should throw an error if the corpus is not built', () => {
       markov = new Markov(data)
       expect(() => {
-        markov.generateSentence()
+        markov.generate()
       }).toThrowError('Corpus is not built')
     })
 
@@ -133,20 +133,20 @@ describe('Markov class', () => {
       expect.assertions(10)
 
       for (let i = 0; i < 10; i++) {
-        const sentence = markov.generateSentence({ maxTries: 5 })
+        const sentence = markov.generate({ maxTries: 5 })
         expect(sentence.tries).toBeLessThanOrEqual(5)
       }
     })
 
     it('should call the `filter` callback', () => {
       const filter = jest.fn(x => true)
-      markov.generateSentence({ filter })
+      markov.generate({ filter })
       expect(filter).toHaveBeenCalled()
     })
 
     it('should throw an error after 10 tries, by default', () => {
       expect(() => {
-        markov.generateSentence({
+        markov.generate({
           filter(result: MarkovResult): boolean {
             return false
           }
@@ -158,7 +158,7 @@ describe('Markov class', () => {
       expect.assertions(10)
 
       for (let i = 0; i < 10; i++) {
-        const result = await markov.generateSentence()
+        const result = await markov.generate()
         const arr = result.string.split(' ')
         const end = arr.slice(arr.length - 2, arr.length)
         expect(map(markov.endWords, 'words')).toContain(end.join(' '))
@@ -166,23 +166,22 @@ describe('Markov class', () => {
     })
 
     it(`should pass the result object to 'filter(result)'`, async () => {
-      expect.assertions(7)
+      expect.assertions(6)
 
       const options = {
         minWords: 5,
         maxTries: 10,
         filter: (result: MarkovResult): boolean => {
-          expect(Object.keys(result)).toHaveLength(5)
+          expect(Object.keys(result)).toHaveLength(4)
           expect(result).toHaveProperty('string')
           expect(result).toHaveProperty('score')
-          expect(result).toHaveProperty('scorePerWord')
           expect(result).toHaveProperty('refs')
           expect(Array.isArray(result.refs)).toBeTruthy()
           expect(result).toHaveProperty('tries')
           return true
         }
       }
-      markov.generateSentence(options)
+      markov.generate(options)
     })
 
   })

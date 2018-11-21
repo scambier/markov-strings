@@ -11,7 +11,6 @@ export type MarkovConstructorOptions = {
 export type MarkovResult = {
   string: string,
   score: number,
-  scorePerWord: number,
   refs: Array<{ string: string }>,
   tries: number
 }

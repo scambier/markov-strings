@@ -120,14 +120,10 @@ export default class Markov {
    * @returns {MarkovResult}
    * @memberof Markov
    */
-  public generateSentence(options: MarkovGenerateOptions = {}): MarkovResult {
+  public generate(options: MarkovGenerateOptions = {}): MarkovResult {
     if (isEmpty(this.corpus)) {
       throw new Error('Corpus is not built')
     }
-
-    // const newOptions: MarkovGenerateOptions = {}
-    // assignIn(newOptions, this.options, options)
-    // options = newOptions
 
     const corpus = cloneDeep(this.corpus)
     const maxTries = options.maxTries ? options.maxTries : 10
@@ -166,7 +162,6 @@ export default class Markov {
           break
         }
       }
-      const scorePerWord = Math.ceil(score / arr.length)
 
       const sentence = arr
         .map(o => o.words)
@@ -176,7 +171,6 @@ export default class Markov {
       const result = {
         string: sentence,
         score,
-        scorePerWord,
         refs: uniqBy(flatten(arr.map(o => o.refs)), 'string'),
         tries
       }
@@ -192,16 +186,16 @@ export default class Markov {
   }
 
   /**
-   * `.generateSentence()` wrapped inside a Promise
+   * `.generate()` wrapped inside a Promise
    *
    * @param {MarkovGenerateOptions} options
    * @returns {Promise<MarkovResult>}
    * @memberof Markov
    */
-  public generateSentenceAsync(options: MarkovGenerateOptions = {}): Promise<MarkovResult> {
+  public generateAsync(options: MarkovGenerateOptions = {}): Promise<MarkovResult> {
     return new Promise((resolve, reject) => {
       try {
-        const result = this.generateSentence(options)
+        const result = this.generate(options)
         resolve(result)
       } catch (e) {
         reject(e)
