@@ -16,7 +16,7 @@
       ],
       "no-unused-expression": false,
       "interface-over-type-literal": false,
-      "quotemark": [true, "single"],
+      "quotemark": [true, "single", "avoid-escape"],
       "no-var-requires": false,
       "arrow-parens": false
   },
