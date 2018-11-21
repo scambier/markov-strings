@@ -1,3 +1,4 @@
 {
-  "tslint.autoFixOnSave": true
+  "tslint.autoFixOnSave": true,
+  "markdown.extension.toc.levels": "1..3"
 }
