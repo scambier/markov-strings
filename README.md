@@ -72,7 +72,7 @@ Create a generator instance.
 #### data
 
 ```js
-string[] | Array<{ string: string }
+string[] | Array<{ string: string }>
 ```
 
 `data` is an array of strings (sentences), or an array of objects. If you wish to use objects, each one must have a `string` attribute. The bigger the array, the better and more various the results.
@@ -81,7 +81,12 @@ Examples:
 
 `[ 'lorem ipsum', 'dolor sit amet' ]`  
 or  
-`[ { string: 'lorem ipsum', attr: 'value' }, { string: 'dolor sit amet', attr: 'other value' } ]`
+```
+[
+  { string: 'lorem ipsum', attr: 'value' },
+  { string: 'dolor sit amet', attr: 'other value' }
+]
+```
 
 #### options
 
@@ -91,20 +96,20 @@ or
 }
 ```
 
-The `stateSize` is the number of words for each state. `1` will output gibberish sentences without much sense. `2` is a sensible default. `3` and more can create good sentences if you have a corpus that allows it.
+The `stateSize` is the number of words for each "link" of the generated sentence. `1` will output gibberish sentences without much sense. `2` is a sensible default for most cases. `3` and more can create good sentences if you have a corpus that allows it.
 
 ### .buildCorpus()
 
 This function **must** be called to build the corpus for Markov generation.
 It will iterate over all words from your `data` parameter to create an internal optimized structure.
 
-Since `.buildCorpus()` can take some time, a non-blocking variant `.buildCorpusAsync()` is conveniently available if you need it.
+Since `.buildCorpus()` can take some time (it loops for each word of each string), a non-blocking variant `.buildCorpusAsync()` is conveniently available if you need it.
 
 ### .generate([options])
 
 Returns an object of type `MarkovResult`:
 
-```js
+```ts
 {
   string: string, // The resulting sentence
   score: number,  // A relative "score" based on the number of possible permutations. Higher is "better", but the actual value depends on your corpus
@@ -115,9 +120,12 @@ Returns an object of type `MarkovResult`:
 
 The `refs` array will contain all objects that have been used to build the sentence. May be useful to fetch some meta data or make some stats.
 
+
+Since `.generate()` can potentially take several seconds or more, a non-blocking variant `.generateAsync()` is conveniently available if you need it.
+
 #### options
 
-```js
+```ts
 {
   maxTries: number // The max number of tentatives before giving up (default is 10)
   filter: (result: MarkovResult) => boolean // A callback to filter results (see example above)
