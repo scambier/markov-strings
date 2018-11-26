@@ -31,7 +31,7 @@ This module makes use of ES6 features.
 ## Usage
 
 ```js
-const Markov = require('markov-strings')
+const Markov = require('markov-strings').default
 // or
 import Markov from 'markov-strings'
 
