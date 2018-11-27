@@ -23,9 +23,6 @@ export type MarkovFragment = {
 
 export type Corpus = { [key: string]: MarkovFragment[] }
 
-const debug = require('debug')
-const warn = debug('markov-strings:warning')
-
 export default class Markov {
   public data: Array<{ string: string }>
   public startWords: MarkovFragment[] = []
