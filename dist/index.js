@@ -1,8 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
-const debug = require('debug');
-const warn = debug('markov-strings:warning');
 class Markov {
     /**
      * Creates an instance of Markov generator.
