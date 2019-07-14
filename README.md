@@ -2,23 +2,23 @@
 [![Coverage Status](https://coveralls.io/repos/github/scambier/markov-strings/badge.svg?branch=master)](https://coveralls.io/github/scambier/markov-strings?branch=master)
 [![npm version](https://badge.fury.io/js/markov-strings.svg)](https://badge.fury.io/js/markov-strings) [![dep](https://david-dm.org/scambier/markov-strings.svg)](https://david-dm.org/scambier/markov-strings#info=devDependencies)
 
-
 # Markov-strings
+
 A simplistic Markov chain text generator.  
 Give it an array of strings, and it will output a randomly generated string.
 
 This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/BelgicaNews).
 
-- [Markov-strings](#markov-strings)
-  - [Prerequisites](#prerequisites)
-  - [Installing](#installing)
-  - [Usage](#usage)
-  - [API](#api)
-    - [new Markov(data, [options])](#new-markovdata-options)
-    - [.buildCorpus()](#buildcorpus)
+- [Markov-strings](#Markov-strings)
+  - [Prerequisites](#Prerequisites)
+  - [Installing](#Installing)
+  - [Usage](#Usage)
+  - [API](#API)
+    - [new Markov(data, [options])](#new-Markovdata-options)
+    - [.buildCorpus()](#buildCorpus)
     - [.generate([options])](#generateoptions)
-  - [Changelog](#changelog)
-  - [Running the tests](#running-the-tests)
+  - [Changelog](#Changelog)
+  - [Running the tests](#Running-the-tests)
 
 ## Prerequisites
 
@@ -80,8 +80,10 @@ string[] | Array<{ string: string }>
 Examples:
 
 `[ 'lorem ipsum', 'dolor sit amet' ]`  
+
 or  
-```
+
+```json
 [
   { string: 'lorem ipsum', attr: 'value' },
   { string: 'dolor sit amet', attr: 'other value' }
@@ -120,7 +122,6 @@ Returns an object of type `MarkovResult`:
 
 The `refs` array will contain all objects that have been used to build the sentence. May be useful to fetch some meta data or make some stats.
 
-
 Since `.generate()` can potentially take several seconds or more, a non-blocking variant `.generateAsync()` is conveniently available if you need it.
 
 #### options
@@ -134,6 +135,10 @@ Since `.generate()` can potentially take several seconds or more, a non-blocking
 
 ## Changelog
 
+#### 2.0.4
+
+- Dependencies update
+
 #### 2.0.0
 
 - **Refactoring with breaking changes**
@@ -143,7 +148,7 @@ Since `.generate()` can potentially take several seconds or more, a non-blocking
 
 #### 1.5.0
 
-- Code rewritten in TypeScript. You can now `import MarkovGenerator from  'markov-strings'`
+- Code rewritten in TypeScript. You can now `import MarkovGenerator from 'markov-strings'`
 
 #### 1.4.0
 

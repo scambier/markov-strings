@@ -1,6 +1,6 @@
 {
   "name": "markov-strings",
-  "version": "2.0.2",
+  "version": "2.0.4",
   "description": "A Markov string generator",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -27,15 +27,15 @@
   "author": "scambier",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^23.3.9",
-    "@types/lodash": "^4.14.116",
-    "@types/node": "^9.6.31",
-    "coveralls": "^3.0.2",
-    "jest": "^23.6.0",
-    "ts-jest": "^23.10.4",
-    "typescript": "^3.1.6"
+    "@types/jest": "^24.0.15",
+    "@types/lodash": "^4.14.136",
+    "@types/node": "^12.6.2",
+    "coveralls": "^3.0.5",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.5.3"
   },
   "dependencies": {
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.14"
   }
 }
