@@ -83,7 +83,7 @@ Examples:
 
 or  
 
-```json
+```js
 [
   { string: 'lorem ipsum', attr: 'value' },
   { string: 'dolor sit amet', attr: 'other value' }
