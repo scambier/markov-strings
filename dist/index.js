@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
+function sampleWithPRNG(array, prng = Math.random) {
+    const length = array == null ? 0 : array.length;
+    return length ? array[Math.floor(prng() * length)] : undefined;
+}
 class Markov {
     /**
      * Creates an instance of Markov generator.
@@ -116,18 +120,19 @@ class Markov {
         }
         const corpus = lodash_1.cloneDeep(this.corpus);
         const maxTries = options.maxTries ? options.maxTries : 10;
+        const prng = options.prng ? options.prng : Math.random;
         let tries;
         // We loop through fragments to create a complete sentence
         for (tries = 1; tries <= maxTries; tries++) {
             let ended = false;
             // Create an array of MarkovCorpusItems
             // The first item is a random startWords element
-            const arr = [lodash_1.sample(this.startWords)];
+            const arr = [sampleWithPRNG(this.startWords, prng)];
             let score = 0;
             // loop to build a complete sentence
             for (let innerTries = 0; innerTries < maxTries; innerTries++) {
                 const block = arr[arr.length - 1]; // last value in array
-                const state = lodash_1.sample(corpus[block.words]); // Find a following item in the corpus
+                const state = sampleWithPRNG(corpus[block.words], prng); // Find a following item in the corpus
                 // If a state cannot be found, the sentence can't be completed
                 if (!state) {
                     break;

@@ -43,6 +43,7 @@ markov.buildCorpus()
 
 const options = {
   maxTries: 20, // Give up if I don't have a sentence after 20 tries (default is 10)
+  prng: Math.random, // An external Pseudo Random Number Generator if you want to get seeded results
   filter: (result) => {
     return
       result.string.split(' ').length >= 5 && // At least 5 words
@@ -129,11 +130,16 @@ Since `.generate()` can potentially take several seconds or more, a non-blocking
 ```ts
 {
   maxTries: number // The max number of tentatives before giving up (default is 10)
+  prng: Math.random, // An external Pseudo Random Number Generator if you want to get seeded results
   filter: (result: MarkovResult) => boolean // A callback to filter results (see example above)
 }
 ```
 
 ## Changelog
+
+#### 2.1.0
+
+- Add an optionnal `prng` parameter at generation to use a specific Pseudo Random Number Generator
 
 #### 2.0.4
 
