@@ -1,6 +1,6 @@
 export declare type MarkovGenerateOptions = {
     maxTries?: number;
-    prng?: any;
+    prng?: () => number;
     filter?: (result: MarkovResult) => boolean;
 };
 export declare type MarkovConstructorOptions = {

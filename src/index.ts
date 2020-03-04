@@ -1,13 +1,13 @@
 import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, slice, some, uniqBy } from 'lodash'
 
-function sampleWithPRNG (array: Array<any>, prng: any = Math.random) {
+function sampleWithPRNG<T>(array: T[], prng: () => number = Math.random): T | undefined {
   const length = array == null ? 0 : array.length
   return length ? array[Math.floor(prng() * length)] : undefined
 }
 
 export type MarkovGenerateOptions = {
   maxTries?: number,
-  prng?: any,
+  prng?: () => number,
   filter?: (result: MarkovResult) => boolean
 }
 
