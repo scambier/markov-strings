@@ -1,7 +1,13 @@
-import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, sample, slice, some, uniqBy } from 'lodash'
+import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, slice, some, uniqBy } from 'lodash'
+
+function sampleWithPRNG<T>(array: T[], prng: () => number = Math.random): T | undefined {
+  const length = array == null ? 0 : array.length
+  return length ? array[Math.floor(prng() * length)] : undefined
+}
 
 export type MarkovGenerateOptions = {
-  maxTries?: number
+  maxTries?: number,
+  prng?: () => number,
   filter?: (result: MarkovResult) => boolean
 }
 
@@ -146,6 +152,7 @@ export default class Markov {
 
     const corpus = cloneDeep(this.corpus)
     const maxTries = options.maxTries ? options.maxTries : 10
+    const prng = options.prng ? options.prng : Math.random
 
     let tries: number
 
@@ -155,14 +162,14 @@ export default class Markov {
 
       // Create an array of MarkovCorpusItems
       // The first item is a random startWords element
-      const arr = [sample(this.startWords)!]
+      const arr = [sampleWithPRNG(this.startWords, prng)!]
 
       let score = 0
 
       // loop to build a complete sentence
       for (let innerTries = 0; innerTries < maxTries; innerTries++) {
         const block = arr[arr.length - 1] // last value in array
-        const state = sample(corpus[block.words]) // Find a following item in the corpus
+        const state = sampleWithPRNG(corpus[block.words], prng) // Find a following item in the corpus
 
         // If a state cannot be found, the sentence can't be completed
         if (!state) {
