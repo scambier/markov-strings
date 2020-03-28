@@ -5,6 +5,8 @@ function sampleWithPRNG<T>(array: T[], prng: () => number = Math.random): T | un
   return length ? array[Math.floor(prng() * length)] : undefined
 }
 
+export type MarkovInputData = Array<{ string: string }>
+
 export type MarkovGenerateOptions = {
   maxTries?: number,
   prng?: () => number,
@@ -18,19 +20,19 @@ export type MarkovConstructorOptions = {
 export type MarkovResult = {
   string: string,
   score: number,
-  refs: Array<{ string: string }>,
+  refs: MarkovInputData,
   tries: number
 }
 
 export type MarkovFragment = {
   words: string
-  refs: Array<{ string: string }>
+  refs: MarkovInputData
 }
 
 export type Corpus = { [key: string]: MarkovFragment[] }
 
 export default class Markov {
-  public data: Array<{ string: string }>
+  public data: MarkovInputData
   public startWords: MarkovFragment[] = []
   public endWords: MarkovFragment[] = []
   public corpus: Corpus = {}
@@ -43,23 +45,30 @@ export default class Markov {
   /**
    * Creates an instance of Markov generator.
    *
-   * @param {(string[] | Array<{ string: string }>)} data An array of strings or objects.
-   * If 'data' is an array of objects, each object must have a 'string' attribute
    * @param {MarkovConstructorOptions} [options={}]
    * @memberof Markov
    */
-  constructor(data: string[] | Array<{ string: string }>, options: MarkovConstructorOptions = {}) {
-    // Format data if necessary
-    if (isString(data[0])) {
-      data = (data as string[]).map(s => ({ string: s }))
-    } else if (!data[0].hasOwnProperty('string')) {
-      throw new Error('Objects in your corpus must have a "string" property')
-    }
-    this.data = data as Array<{ string: string }>
+  constructor(options: MarkovConstructorOptions = {}) {
+    this.data = []
 
     // Save options
     this.options = this.defaultOptions
     assignIn(this.options, options)
+  }
+
+  public addData(rawData: MarkovInputData | string[]) {
+    // Format data if necessary
+    let input: MarkovInputData = []
+    if (isString(rawData[0])) {
+      input = (rawData as string[]).map(s => ({ string: s }))
+    }
+    else if (!rawData[0].hasOwnProperty('string')) {
+      throw new Error('Objects in your corpus must have a "string" property')
+    }
+
+    this.buildCorpus(input)
+
+    this.data = this.data.concat(input)
   }
 
   /**
@@ -67,10 +76,10 @@ export default class Markov {
    *
    * @memberof Markov
    */
-  public buildCorpus(): void {
+  private buildCorpus(data: MarkovInputData): void {
     const options = this.options
 
-    this.data.forEach(item => {
+    data.forEach(item => {
       const line = item.string
       const words = line.split(' ')
       const stateSize = options.stateSize! // Default value of 2 is set in the constructor
@@ -127,10 +136,10 @@ export default class Markov {
    * @returns {Promise<void>}
    * @memberof Markov
    */
-  public buildCorpusAsync(): Promise<void> {
+  public addDataAsync(data: MarkovInputData | string[]): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        this.buildCorpus()
+        this.addData(data)
         resolve()
       } catch (e) {
         reject(e)

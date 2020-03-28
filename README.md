@@ -4,21 +4,21 @@
 
 # Markov-strings
 
-A simplistic Markov chain text generator.  
+A simplistic Markov chain text generator.
 Give it an array of strings, and it will output a randomly generated string.
 
 This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/BelgicaNews).
 
-- [Markov-strings](#Markov-strings)
-  - [Prerequisites](#Prerequisites)
-  - [Installing](#Installing)
-  - [Usage](#Usage)
-  - [API](#API)
-    - [new Markov(data, [options])](#new-Markovdata-options)
-    - [.buildCorpus()](#buildCorpus)
+- [Markov-strings](#markov-strings)
+  - [Prerequisites](#prerequisites)
+  - [Installing](#installing)
+  - [Usage](#usage)
+  - [API](#api)
+    - [new Markov([options])](#new-markovoptions)
+    - [.addData(data)](#adddatadata)
     - [.generate([options])](#generateoptions)
-  - [Changelog](#Changelog)
-  - [Running the tests](#Running-the-tests)
+  - [Changelog](#changelog)
+  - [Running the tests](#running-the-tests)
 
 ## Prerequisites
 
@@ -38,8 +38,10 @@ import Markov from 'markov-strings'
 const data = [/* insert a few hundreds/thousands sentences here */]
 
 // Build the Markov generator
-const markov = new Markov(data, { stateSize: 2 })
-markov.buildCorpus()
+const markov = new Markov({ stateSize: 2 })
+
+// Add data for the generator
+markov.addData(data)
 
 const options = {
   maxTries: 20, // Give up if I don't have a sentence after 20 tries (default is 10)
@@ -66,30 +68,9 @@ console.log(result)
 
 ## API
 
-### new Markov(data, [options])
+### new Markov([options])
 
 Create a generator instance.
-
-#### data
-
-```js
-string[] | Array<{ string: string }>
-```
-
-`data` is an array of strings (sentences), or an array of objects. If you wish to use objects, each one must have a `string` attribute. The bigger the array, the better and more various the results.
-
-Examples:
-
-`[ 'lorem ipsum', 'dolor sit amet' ]`  
-
-or  
-
-```js
-[
-  { string: 'lorem ipsum', attr: 'value' },
-  { string: 'dolor sit amet', attr: 'other value' }
-]
-```
 
 #### options
 
@@ -101,12 +82,36 @@ or
 
 The `stateSize` is the number of words for each "link" of the generated sentence. `1` will output gibberish sentences without much sense. `2` is a sensible default for most cases. `3` and more can create good sentences if you have a corpus that allows it.
 
-### .buildCorpus()
+### .addData(data)
 
-This function **must** be called to build the corpus for Markov generation.
-It will iterate over all words from your `data` parameter to create an internal optimized structure.
+To function correctly, the Markov generator needs its internal data to be correctly structured. `.addData(data)` allows you add raw data, that is automatically formatted to fit the internal structure.
 
-Since `.buildCorpus()` can take some time (it loops for each word of each string), a non-blocking variant `.buildCorpusAsync()` is conveniently available if you need it.
+You can call `.addData(data)` as often as you need, with new data each time.
+
+#### data
+
+```js
+string[] | Array<{ string: string }>
+```
+
+`data` is an array of strings (sentences), or an array of objects. If you wish to use objects, each one must have a `string` attribute. The bigger the array, the better and more various the results.
+
+Examples:
+
+```js
+[ 'lorem ipsum', 'dolor sit amet' ]
+```
+
+or
+
+```js
+[
+  { string: 'lorem ipsum', attr: 'value' },
+  { string: 'dolor sit amet', attr: 'other value' }
+]
+```
+
+Since `.addData(data)` can take some time (it loops for each word of each string), a non-blocking variant `.addDataAsync(data)` is conveniently available if you need it.
 
 ### .generate([options])
 
@@ -136,6 +141,10 @@ Since `.generate()` can potentially take several seconds or more, a non-blocking
 ```
 
 ## Changelog
+
+#### 3.0.0
+
+Refactoring to facilitate iterative construction of the corpus (multiple `.addData()` instead of a one-time `buildCorpus()`)
 
 #### 2.1.0
 

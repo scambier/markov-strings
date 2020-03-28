@@ -14,45 +14,48 @@ const data = [
 
 describe('Markov class', () => {
   describe('Constructor', () => {
-    it('should throw an error if corpus is invalid', () => {
-      expect(() => {
-        // @ts-ignore
-        const markov = new Markov([{}])
-      }).toThrowError()
-    })
 
     it('should have a default stateSize', () => {
-      const markov = new Markov(data)
+      const markov = new Markov()
       expect(markov.options.stateSize).toBe(2)
     })
 
     it('should save a different stateSize', () => {
-      const markov = new Markov(data, { stateSize: 3 })
+      const markov = new Markov({ stateSize: 3 })
       expect(markov.options.stateSize).toBe(3)
     })
   })
 
-  describe('Build the corpus', () => {
+  describe('Adding data', () => {
     it('should build synchronously', () => {
-      const markov = new Markov(data)
+      const markov = new Markov()
       expect(markov.corpus).toEqual({})
-      markov.buildCorpus()
+      markov.addData(data)
       expect(markov.corpus).not.toEqual({})
     })
 
     it('should build asynchronously', async () => {
-      const markov = new Markov(data)
-      markov.buildCorpus = jest.fn()
-      await markov.buildCorpusAsync()
-      expect(markov.buildCorpus).toHaveBeenCalled()
+      const markov = new Markov()
+      markov.addData = jest.fn()
+      await markov.addDataAsync(data)
+      expect(markov.addData).toHaveBeenCalled()
     })
+
+    it('should throw an error if the data structure is invalid', () => {
+      const markov = new Markov()
+      expect(() => {
+        // @ts-ignore
+        markov.addData([{}])
+      }).toThrowError()
+    })
+
   })
 
-  describe('After building the corpus', () => {
+  describe('After adding data', () => {
     let markov: Markov
     beforeEach(() => {
-      markov = new Markov(data)
-      markov.buildCorpus()
+      markov = new Markov()
+      markov.addData(data)
     })
 
     describe('The startWords array', () => {
@@ -87,32 +90,26 @@ describe('Markov class', () => {
         expect(some(end, { words: 'est rien…' })).toBeTruthy()
       })
     })
-  })
 
-  describe('The corpus itself', () => {
-    let markov: Markov
-    beforeEach(() => {
-      markov = new Markov(data)
-      markov.buildCorpus()
-    })
-
-    it('should have the right values for the right keys', () => {
-      const corpus = markov.corpus
-      expect(some(corpus['Lorem ipsum'], { words: 'dolor sit' })).toBeTruthy()
-      expect(
-        some(corpus['Lorem ipsum'], { words: 'duplicate start' })
-      ).toBeTruthy()
-      expect(
-        some(corpus['tempor, erat'], { words: 'vel lacinia' })
-      ).toBeTruthy()
+    describe('The corpus itself', () => {
+      it('should have the right values for the right keys', () => {
+        const corpus = markov.corpus
+        expect(some(corpus['Lorem ipsum'], { words: 'dolor sit' })).toBeTruthy()
+        expect(
+          some(corpus['Lorem ipsum'], { words: 'duplicate start' })
+        ).toBeTruthy()
+        expect(
+          some(corpus['tempor, erat'], { words: 'vel lacinia' })
+        ).toBeTruthy()
+      })
     })
   })
 
-  describe('The sentence generation', () => {
+  describe('The sentence generator', () => {
     let markov: Markov
     beforeEach(() => {
-      markov = new Markov(data)
-      markov.buildCorpus()
+      markov = new Markov()
+      markov.addData(data)
     })
 
     it('should generate asynchronously', async () => {
@@ -122,7 +119,7 @@ describe('Markov class', () => {
     })
 
     it('should throw an error if the corpus is not built', () => {
-      markov = new Markov(data)
+      markov = new Markov()
       expect(() => {
         markov.generate()
       }).toThrowError('Corpus is not built')
