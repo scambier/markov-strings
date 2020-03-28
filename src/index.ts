@@ -31,12 +31,20 @@ export type MarkovFragment = {
 
 export type Corpus = { [key: string]: MarkovFragment[] }
 
+export type MarkovImportExport = {
+  corpus: Corpus,
+  startWords: MarkovFragment[],
+  endWords: MarkovFragment[],
+  options: MarkovConstructorOptions
+}
+
 export default class Markov {
   public data: MarkovInputData
+  public options: MarkovConstructorOptions
+
   public startWords: MarkovFragment[] = []
   public endWords: MarkovFragment[] = []
   public corpus: Corpus = {}
-  public options: MarkovConstructorOptions
 
   private defaultOptions: MarkovConstructorOptions = {
     stateSize: 2
@@ -54,6 +62,30 @@ export default class Markov {
     // Save options
     this.options = this.defaultOptions
     assignIn(this.options, options)
+  }
+
+  /**
+   * Imports a corpus. This overwrites existing data.
+   *
+   * @param data
+   */
+  public import(data: MarkovImportExport): void {
+    this.options = data.options
+    this.corpus = cloneDeep(data.corpus)
+    this.startWords = cloneDeep(data.startWords)
+    this.endWords = cloneDeep(data.endWords)
+  }
+
+  /**
+   * Exports structed data used to generate sentence.
+   */
+  public export(): MarkovImportExport {
+    return cloneDeep({
+      options: this.options,
+      corpus: this.corpus,
+      startWords: this.startWords,
+      endWords: this.endWords
+    })
   }
 
   public addData(rawData: MarkovInputData | string[]) {
