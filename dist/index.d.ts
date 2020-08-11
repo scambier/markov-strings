@@ -1,3 +1,6 @@
+export declare type MarkovInputData = Array<{
+    string: string;
+}>;
 export declare type MarkovGenerateOptions = {
     maxTries?: number;
     prng?: () => number;
@@ -9,53 +12,60 @@ export declare type MarkovConstructorOptions = {
 export declare type MarkovResult = {
     string: string;
     score: number;
-    refs: Array<{
-        string: string;
-    }>;
+    refs: MarkovInputData;
     tries: number;
 };
 export declare type MarkovFragment = {
     words: string;
-    refs: Array<{
-        string: string;
-    }>;
+    refs: MarkovInputData;
 };
 export declare type Corpus = {
     [key: string]: MarkovFragment[];
 };
+export declare type MarkovImportExport = {
+    corpus: Corpus;
+    startWords: MarkovFragment[];
+    endWords: MarkovFragment[];
+    options: MarkovConstructorOptions;
+};
 export default class Markov {
-    data: Array<{
-        string: string;
-    }>;
+    data: MarkovInputData;
+    options: MarkovConstructorOptions;
     startWords: MarkovFragment[];
     endWords: MarkovFragment[];
     corpus: Corpus;
-    options: MarkovConstructorOptions;
     private defaultOptions;
     /**
      * Creates an instance of Markov generator.
      *
-     * @param {(string[] | Array<{ string: string }>)} data An array of strings or objects.
-     * If 'data' is an array of objects, each object must have a 'string' attribute
      * @param {MarkovConstructorOptions} [options={}]
      * @memberof Markov
      */
-    constructor(data: string[] | Array<{
-        string: string;
-    }>, options?: MarkovConstructorOptions);
+    constructor(options?: MarkovConstructorOptions);
+    /**
+     * Imports a corpus. This overwrites existing data.
+     *
+     * @param data
+     */
+    import(data: MarkovImportExport): void;
+    /**
+     * Exports structed data used to generate sentence.
+     */
+    export(): MarkovImportExport;
+    addData(rawData: MarkovInputData | string[]): void;
     /**
      * Builds the corpus. You must call this before generating sentences.
      *
      * @memberof Markov
      */
-    buildCorpus(): void;
+    private buildCorpus;
     /**
      * `.buildCorpus()` wrapped inside a Promise
      *
      * @returns {Promise<void>}
      * @memberof Markov
      */
-    buildCorpusAsync(): Promise<void>;
+    addDataAsync(data: MarkovInputData | string[]): Promise<void>;
     /**
      * Generates a result, that contains a string and its references
      *

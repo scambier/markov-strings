@@ -9,38 +9,63 @@ class Markov {
     /**
      * Creates an instance of Markov generator.
      *
-     * @param {(string[] | Array<{ string: string }>)} data An array of strings or objects.
-     * If 'data' is an array of objects, each object must have a 'string' attribute
      * @param {MarkovConstructorOptions} [options={}]
      * @memberof Markov
      */
-    constructor(data, options = {}) {
+    constructor(options = {}) {
         this.startWords = [];
         this.endWords = [];
         this.corpus = {};
         this.defaultOptions = {
             stateSize: 2
         };
-        // Format data if necessary
-        if (lodash_1.isString(data[0])) {
-            data = data.map(s => ({ string: s }));
-        }
-        else if (!data[0].hasOwnProperty('string')) {
-            throw new Error('Objects in your corpus must have a "string" property');
-        }
-        this.data = data;
+        this.data = [];
         // Save options
         this.options = this.defaultOptions;
         lodash_1.assignIn(this.options, options);
+    }
+    /**
+     * Imports a corpus. This overwrites existing data.
+     *
+     * @param data
+     */
+    import(data) {
+        this.options = data.options;
+        this.corpus = lodash_1.cloneDeep(data.corpus);
+        this.startWords = lodash_1.cloneDeep(data.startWords);
+        this.endWords = lodash_1.cloneDeep(data.endWords);
+    }
+    /**
+     * Exports structed data used to generate sentence.
+     */
+    export() {
+        return lodash_1.cloneDeep({
+            options: this.options,
+            corpus: this.corpus,
+            startWords: this.startWords,
+            endWords: this.endWords
+        });
+    }
+    addData(rawData) {
+        // Format data if necessary
+        let input = [];
+        if (lodash_1.isString(rawData[0])) {
+            input = rawData.map(s => ({ string: s }));
+        }
+        else if (!rawData[0].hasOwnProperty('string')) {
+            throw new Error('Objects in your corpus must have a "string" property');
+        }
+        this.buildCorpus(input);
+        this.data = this.data.concat(input);
     }
     /**
      * Builds the corpus. You must call this before generating sentences.
      *
      * @memberof Markov
      */
-    buildCorpus() {
+    buildCorpus(data) {
         const options = this.options;
-        this.data.forEach(item => {
+        data.forEach(item => {
             const line = item.string;
             const words = line.split(' ');
             const stateSize = options.stateSize; // Default value of 2 is set in the constructor
@@ -96,10 +121,10 @@ class Markov {
      * @returns {Promise<void>}
      * @memberof Markov
      */
-    buildCorpusAsync() {
+    addDataAsync(data) {
         return new Promise((resolve, reject) => {
             try {
-                this.buildCorpus();
+                this.addData(data);
                 resolve();
             }
             catch (e) {
