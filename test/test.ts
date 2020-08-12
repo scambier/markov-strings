@@ -1,4 +1,4 @@
-import { map, some } from 'lodash'
+import { map, some } from 'lodash-es'
 import Markov, { MarkovResult } from '../src'
 
 const data = [

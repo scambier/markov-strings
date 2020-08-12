@@ -1,4 +1,4 @@
-import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, slice, some, uniqBy } from 'lodash'
+import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, slice, some, uniqBy } from 'lodash-es'
 
 function sampleWithPRNG<T>(array: T[], prng: () => number = Math.random): T | undefined {
   const length = array == null ? 0 : array.length
