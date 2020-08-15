@@ -46,6 +46,13 @@ describe('Markov class', () => {
       await markov.buildCorpusAsync()
       expect(markov.buildCorpus).toHaveBeenCalled()
     })
+
+    it('should accept objects', () => {
+      const markov = new Markov(data.map(o => ({ string: o })))
+      expect(markov.corpus).toEqual({})
+      markov.buildCorpus()
+      expect(markov.corpus).not.toEqual({})
+    })
   })
 
   describe('After building the corpus', () => {
