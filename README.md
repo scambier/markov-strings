@@ -2,6 +2,11 @@
 [![Coverage Status](https://coveralls.io/repos/github/scambier/markov-strings/badge.svg?branch=master)](https://coveralls.io/github/scambier/markov-strings?branch=master)
 [![npm version](https://badge.fury.io/js/markov-strings.svg)](https://badge.fury.io/js/markov-strings) [![dep](https://david-dm.org/scambier/markov-strings.svg)](https://david-dm.org/scambier/markov-strings#info=devDependencies)
 
+---
+! This is the readme for markov-strings **2.x.x.**. The docs for **3.x.x** are [here](https://github.com/scambier/markov-strings/tree/master) !
+
+---
+
 # Markov-strings
 
 A simplistic Markov chain text generator.  
@@ -9,16 +14,16 @@ Give it an array of strings, and it will output a randomly generated string.
 
 This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/BelgicaNews).
 
-- [Markov-strings](#Markov-strings)
-  - [Prerequisites](#Prerequisites)
-  - [Installing](#Installing)
-  - [Usage](#Usage)
-  - [API](#API)
-    - [new Markov(data, [options])](#new-Markovdata-options)
-    - [.buildCorpus()](#buildCorpus)
+- [Markov-strings](#markov-strings)
+  - [Prerequisites](#prerequisites)
+  - [Installing](#installing)
+  - [Usage](#usage)
+  - [API](#api)
+    - [new Markov(data, [options])](#new-markovdata-options)
+    - [.buildCorpus()](#buildcorpus)
     - [.generate([options])](#generateoptions)
-  - [Changelog](#Changelog)
-  - [Running the tests](#Running-the-tests)
+  - [Changelog](#changelog)
+  - [Running the tests](#running-the-tests)
 
 ## Prerequisites
 
@@ -45,9 +50,8 @@ const options = {
   maxTries: 20, // Give up if I don't have a sentence after 20 tries (default is 10)
   prng: Math.random, // An external Pseudo Random Number Generator if you want to get seeded results
   filter: (result) => {
-    return
-      result.string.split(' ').length >= 5 && // At least 5 words
-      result.string.endsWith('.')             // End sentences with a dot.
+    return result.string.split(' ').length >= 5 && // At least 5 words
+           result.string.endsWith('.')             // End sentences with a dot.
   }
 }
 
@@ -80,9 +84,9 @@ string[] | Array<{ string: string }>
 
 Examples:
 
-`[ 'lorem ipsum', 'dolor sit amet' ]`  
+`[ 'lorem ipsum', 'dolor sit amet' ]`
 
-or  
+or
 
 ```js
 [
