@@ -3,6 +3,9 @@
   "version": "3.0.0-beta.1",
   "description": "A Markov string generator",
   "main": "dist/index.js",
+  "files": [
+    "./dist"
+  ],
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "tsc --watch",
