@@ -49,6 +49,12 @@ describe('Markov class', () => {
       }).toThrowError()
     })
 
+    it('should accept objects', () => {
+      const markov = new Markov()
+      markov.addData(data.map(o => ({ string: o })))
+      expect(markov.corpus).not.toEqual({})
+    })
+
   })
 
   describe('After adding data', () => {
@@ -101,6 +107,48 @@ describe('Markov class', () => {
         expect(
           some(corpus['tempor, erat'], { words: 'vel lacinia' })
         ).toBeTruthy()
+      })
+    })
+
+    describe('Export data', () => {
+      it('should clone the original corpus values', () => {
+        const exported = markov.export()
+
+        expect(exported.corpus).toEqual(markov.corpus)
+        expect(exported.corpus).not.toBe(markov.corpus)
+
+        expect(exported.startWords).not.toBe(markov.startWords)
+        expect(exported.startWords).toEqual(markov.startWords)
+
+        expect(exported.endWords).not.toBe(markov.endWords)
+        expect(exported.endWords).toEqual(markov.endWords)
+
+        expect(exported.options).toEqual(markov.options)
+        expect(exported.options).not.toBe(markov.options)
+      })
+    })
+
+    describe('Import data', () => {
+      it('should overwrite original values', () => {
+        const exported = markov.export()
+        const newMarkov = new Markov()
+
+        // Make sure that the corpus is empty
+        expect(newMarkov.corpus).toEqual({})
+
+        newMarkov.import(exported)
+
+        expect(newMarkov.corpus).toEqual(exported.corpus)
+        expect(newMarkov.corpus).not.toBe(exported.corpus)
+
+        expect(newMarkov.startWords).toEqual(exported.startWords)
+        expect(newMarkov.startWords).not.toBe(exported.startWords)
+
+        expect(newMarkov.endWords).toEqual(exported.endWords)
+        expect(newMarkov.endWords).not.toBe(exported.endWords)
+
+        expect(newMarkov.options).toEqual(exported.options)
+        expect(newMarkov.options).not.toBe(exported.options)
       })
     })
   })

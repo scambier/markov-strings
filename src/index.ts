@@ -5,7 +5,7 @@ function sampleWithPRNG<T>(array: T[], prng: () => number = Math.random): T | un
   return length ? array[Math.floor(prng() * length)] : undefined
 }
 
-export type MarkovInputData = Array<{ string: string }>
+export type MarkovInputData = { string: string }[]
 
 export type MarkovGenerateOptions = {
   maxTries?: number,
@@ -70,7 +70,7 @@ export default class Markov {
    * @param data
    */
   public import(data: MarkovImportExport): void {
-    this.options = data.options
+    this.options = cloneDeep(data.options)
     this.corpus = cloneDeep(data.corpus)
     this.startWords = cloneDeep(data.startWords)
     this.endWords = cloneDeep(data.endWords)
@@ -94,7 +94,10 @@ export default class Markov {
     if (isString(rawData[0])) {
       input = (rawData as string[]).map(s => ({ string: s }))
     }
-    else if (!rawData[0].hasOwnProperty('string')) {
+    else if (rawData[0].hasOwnProperty('string')) {
+      input = rawData as MarkovInputData
+    }
+    else {
       throw new Error('Objects in your corpus must have a "string" property')
     }
 
