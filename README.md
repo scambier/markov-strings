@@ -2,6 +2,11 @@
 [![Coverage Status](https://coveralls.io/repos/github/scambier/markov-strings/badge.svg?branch=master)](https://coveralls.io/github/scambier/markov-strings?branch=master)
 [![npm version](https://badge.fury.io/js/markov-strings.svg)](https://badge.fury.io/js/markov-strings) [![dep](https://david-dm.org/scambier/markov-strings.svg)](https://david-dm.org/scambier/markov-strings#info=devDependencies)
 
+---
+! This is the readme for markov-strings **3.x.x.**. The docs for the older **2.x.x** are [here](https://github.com/scambier/markov-strings/tree/v2) !
+
+---
+
 # Markov-strings
 
 A simplistic Markov chain text generator.
@@ -47,9 +52,8 @@ const options = {
   maxTries: 20, // Give up if I don't have a sentence after 20 tries (default is 10)
   prng: Math.random, // An external Pseudo Random Number Generator if you want to get seeded results
   filter: (result) => {
-    return
-      result.string.split(' ').length >= 5 && // At least 5 words
-      result.string.endsWith('.')             // End sentences with a dot.
+    return result.string.split(' ').length >= 5 && // At least 5 words
+           result.string.endsWith('.')             // End sentences with a dot.
   }
 }
 
