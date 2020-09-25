@@ -1,9 +1,6 @@
-import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, slice, some, uniqBy } from 'lodash'
+import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, slice, some, uniqBy } from 'lodash-es'
 
-function sampleWithPRNG<T>(array: T[], prng: () => number = Math.random): T | undefined {
-  const length = array == null ? 0 : array.length
-  return length ? array[Math.floor(prng() * length)] : undefined
-}
+export type MarkovInputData = { string: string }[]
 
 export type MarkovGenerateOptions = {
   maxTries?: number,
@@ -11,51 +8,67 @@ export type MarkovGenerateOptions = {
   filter?: (result: MarkovResult) => boolean
 }
 
+/**
+ * Data to build the Markov instance
+ */
 export type MarkovConstructorOptions = {
   stateSize?: number
+}
+
+/**
+ * While `stateSize` is optional as a constructor parameter,
+ * it must exist as a member
+ */
+export type MarkovDataMembers = {
+  stateSize: number
 }
 
 export type MarkovResult = {
   string: string,
   score: number,
-  refs: Array<{ string: string }>,
+  refs: MarkovInputData,
   tries: number
 }
 
 export type MarkovFragment = {
   words: string
-  refs: Array<{ string: string }>
+  refs: MarkovInputData
 }
 
 export type Corpus = { [key: string]: MarkovFragment[] }
 
+export type MarkovImportExport = {
+  corpus: Corpus,
+  startWords: MarkovFragment[],
+  endWords: MarkovFragment[],
+  options: MarkovDataMembers
+}
+
+function sampleWithPRNG<T>(array: T[], prng: () => number = Math.random): T | undefined {
+  const length = array == null ? 0 : array.length
+  return length ? array[Math.floor(prng() * length)] : undefined
+}
+
 export default class Markov {
-  public data: Array<{ string: string }>
+  public data: MarkovInputData
+  public options: MarkovDataMembers
+
   public startWords: MarkovFragment[] = []
   public endWords: MarkovFragment[] = []
   public corpus: Corpus = {}
-  public options: MarkovConstructorOptions
 
-  private defaultOptions: MarkovConstructorOptions = {
+  private defaultOptions: MarkovDataMembers = {
     stateSize: 2
   }
 
   /**
    * Creates an instance of Markov generator.
    *
-   * @param {(string[] | Array<{ string: string }>)} data An array of strings or objects.
-   * If 'data' is an array of objects, each object must have a 'string' attribute
    * @param {MarkovConstructorOptions} [options={}]
    * @memberof Markov
    */
-  constructor(data: string[] | Array<{ string: string }>, options: MarkovConstructorOptions = {}) {
-    // Format data if necessary
-    if (isString(data[0])) {
-      data = (data as string[]).map(s => ({ string: s }))
-    } else if (!data[0].hasOwnProperty('string')) {
-      throw new Error('Objects in your corpus must have a "string" property')
-    }
-    this.data = data as Array<{ string: string }>
+  constructor(options: MarkovConstructorOptions = {}) {
+    this.data = []
 
     // Save options
     this.options = this.defaultOptions
@@ -63,30 +76,84 @@ export default class Markov {
   }
 
   /**
+   * Imports a corpus. This overwrites existing data.
+   *
+   * @param data
+   */
+  public import(data: MarkovImportExport): void {
+    this.options = cloneDeep(data.options)
+    this.corpus = cloneDeep(data.corpus)
+    this.startWords = cloneDeep(data.startWords)
+    this.endWords = cloneDeep(data.endWords)
+  }
+
+  /**
+   * Exports structed data used to generate sentence.
+   */
+  public export(): MarkovImportExport {
+    return cloneDeep({
+      options: this.options,
+      corpus: this.corpus,
+      startWords: this.startWords,
+      endWords: this.endWords
+    })
+  }
+
+  public addData(rawData: MarkovInputData | string[]) {
+    // Format data if necessary
+    let input: MarkovInputData = []
+    if (isString(rawData[0])) {
+      input = (rawData as string[]).map(s => ({ string: s }))
+    }
+    else if (rawData[0].hasOwnProperty('string')) {
+      input = rawData as MarkovInputData
+    }
+    else {
+      throw new Error('Objects in your corpus must have a "string" property')
+    }
+
+    this.buildCorpus(input)
+
+    this.data = this.data.concat(input)
+  }
+
+  /**
    * Builds the corpus. You must call this before generating sentences.
    *
    * @memberof Markov
    */
-  public buildCorpus(): void {
+  private buildCorpus(data: MarkovInputData): void {
     const options = this.options
 
-    this.data.forEach(item => {
+    // Loop through all sentences
+    data.forEach(item => {
       const line = item.string
       const words = line.split(' ')
-      const stateSize = options.stateSize! // Default value of 2 is set in the constructor
+      const stateSize = options.stateSize // Default value of 2 is set in the constructor
 
-      // Start words
+      //#region Start words
+      // "Start words" is the list of words that can start a generated chain.
+
       const start = slice(words, 0, stateSize).join(' ')
       const oldStartObj = this.startWords.find(o => o.words === start)
+
+      // If we already have identical startWords
       if (oldStartObj) {
+        // If the current item is not present in the references, add it
         if (!includes(oldStartObj.refs, item)) {
           oldStartObj.refs.push(item)
         }
-      } else {
+      }
+      else {
+        // Add the startWords (and reference) to the list
         this.startWords.push({ words: start, refs: [item] })
       }
 
-      // End words
+      //#endregion Start words
+
+      //#region End words
+      // "End words" is the list of words that can end a generated chain.
+
       const end = slice(words, words.length - stateSize, words.length).join(' ')
       const oldEndObj = this.endWords.find(o => o.words === end)
       if (oldEndObj) {
@@ -97,7 +164,13 @@ export default class Markov {
         this.endWords.push({ words: end, refs: [item] })
       }
 
-      // Build corpus
+      //#endregion End words
+
+      //#region Corpus generation
+
+      // We loop through all words in the sentence to build "blocks" of `stateSize`
+      // e.g. for a stateSize of 2, "lorem ipsum dolor sit amet" will have the following blocks:
+      //    "lorem ipsum", "ipsum dolor", "dolor sit", and "sit amet"
       for (let i = 0; i < words.length - 1; i++) {
         const curr = slice(words, i, i + stateSize).join(' ')
         const next = slice(words, i + stateSize, i + stateSize * 2).join(' ')
@@ -105,38 +178,28 @@ export default class Markov {
           continue
         }
 
-        // add block to corpus
+        // Check if the corpus already has a corresponding "curr" block
         if (this.corpus.hasOwnProperty(curr)) {
-          // if corpus already owns this chain
           const oldObj = this.corpus[curr].find(o => o.words === next)
           if (oldObj) {
+            // If the corpus already has the chain "curr -> next",
+            // just add the current reference for this block
             oldObj.refs.push(item)
           } else {
+            // Add the new "next" block in the list of possible paths for "curr"
             this.corpus[curr].push({ words: next, refs: [item] })
           }
-        } else {
+        }
+        else {
+          // Add the "curr" block and link it with the "next" one
           this.corpus[curr] = [{ words: next, refs: [item] }]
         }
       }
+
+      //#endregion Corpus generation
     })
   }
 
-  /**
-   * `.buildCorpus()` wrapped inside a Promise
-   *
-   * @returns {Promise<void>}
-   * @memberof Markov
-   */
-  public buildCorpusAsync(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        this.buildCorpus()
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
 
   /**
    * Generates a result, that contains a string and its references
@@ -208,24 +271,7 @@ export default class Markov {
 
       return result
     }
-    throw new Error(`Failed to build a sentence after ${tries - 1} tries`)
+    throw new Error(`Failed to build a sentence after ${tries - 1} tries. Possible solutions: try a less restrictive filter(), give more raw data to the corpus builder, or increase the number of maximum tries.`)
   }
 
-  /**
-   * `.generate()` wrapped inside a Promise
-   *
-   * @param {MarkovGenerateOptions} options
-   * @returns {Promise<MarkovResult>}
-   * @memberof Markov
-   */
-  public generateAsync(options: MarkovGenerateOptions = {}): Promise<MarkovResult> {
-    return new Promise((resolve, reject) => {
-      try {
-        const result = this.generate(options)
-        resolve(result)
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
 }

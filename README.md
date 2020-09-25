@@ -2,23 +2,30 @@
 [![Coverage Status](https://coveralls.io/repos/github/scambier/markov-strings/badge.svg?branch=master)](https://coveralls.io/github/scambier/markov-strings?branch=master)
 [![npm version](https://badge.fury.io/js/markov-strings.svg)](https://badge.fury.io/js/markov-strings) [![dep](https://david-dm.org/scambier/markov-strings.svg)](https://david-dm.org/scambier/markov-strings#info=devDependencies)
 
+---
+! This is the readme for markov-strings **3.x.x.** - The docs for the older **2.x.x** are [here](https://github.com/scambier/markov-strings/tree/v2) !
+
+---
+
 # Markov-strings
 
-A simplistic Markov chain text generator.  
+A simplistic Markov chain text generator.
 Give it an array of strings, and it will output a randomly generated string.
 
 This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/BelgicaNews).
 
-- [Markov-strings](#Markov-strings)
-  - [Prerequisites](#Prerequisites)
-  - [Installing](#Installing)
-  - [Usage](#Usage)
-  - [API](#API)
-    - [new Markov(data, [options])](#new-Markovdata-options)
-    - [.buildCorpus()](#buildCorpus)
-    - [.generate([options])](#generateoptions)
-  - [Changelog](#Changelog)
-  - [Running the tests](#Running-the-tests)
+- [Markov-strings](#markov-strings)
+  - [Prerequisites](#prerequisites)
+  - [Installing](#installing)
+  - [Usage](#usage)
+  - [API](#api)
+    - [`new Markov([options])`](#new-markovoptions)
+    - [`.addData(data)`](#adddatadata)
+    - [`.generate([options])`](#generateoptions)
+    - [`.export()` and `.import(data)`](#export-and-importdata)
+  - [Unit tests](#unit-tests)
+  - [Changelog](#changelog)
+  - [Running the tests](#running-the-tests)
 
 ## Prerequisites
 
@@ -38,16 +45,21 @@ import Markov from 'markov-strings'
 const data = [/* insert a few hundreds/thousands sentences here */]
 
 // Build the Markov generator
-const markov = new Markov(data, { stateSize: 2 })
-markov.buildCorpus()
+const markov = new Markov({ stateSize: 2 })
+
+// Add data for the generator
+markov.addData(data)
 
 const options = {
   maxTries: 20, // Give up if I don't have a sentence after 20 tries (default is 10)
-  prng: Math.random, // An external Pseudo Random Number Generator if you want to get seeded results
+
+  // If you want to get seeded results, you can provide an external PRNG.
+  prng: Math.random, // Default value if left empty
+
+  // You'll often need to manually filter raw results to get something that fits your needs.
   filter: (result) => {
-    return
-      result.string.split(' ').length >= 5 && // At least 5 words
-      result.string.endsWith('.')             // End sentences with a dot.
+    return result.string.split(' ').length >= 5 && // At least 5 words
+           result.string.endsWith('.')             // End sentences with a dot.
   }
 }
 
@@ -64,32 +76,13 @@ console.log(result)
 */
 ```
 
+Markov-strings is built in TypeScript, and exports several types to help you. Take a look at [the source](https://github.com/scambier/markov-strings/blob/master/src/index.ts) to see how it works.
+
 ## API
 
-### new Markov(data, [options])
+### `new Markov([options])`
 
 Create a generator instance.
-
-#### data
-
-```js
-string[] | Array<{ string: string }>
-```
-
-`data` is an array of strings (sentences), or an array of objects. If you wish to use objects, each one must have a `string` attribute. The bigger the array, the better and more various the results.
-
-Examples:
-
-`[ 'lorem ipsum', 'dolor sit amet' ]`  
-
-or  
-
-```js
-[
-  { string: 'lorem ipsum', attr: 'value' },
-  { string: 'dolor sit amet', attr: 'other value' }
-]
-```
 
 #### options
 
@@ -101,14 +94,38 @@ or
 
 The `stateSize` is the number of words for each "link" of the generated sentence. `1` will output gibberish sentences without much sense. `2` is a sensible default for most cases. `3` and more can create good sentences if you have a corpus that allows it.
 
-### .buildCorpus()
+### `.addData(data)`
 
-This function **must** be called to build the corpus for Markov generation.
-It will iterate over all words from your `data` parameter to create an internal optimized structure.
+To function correctly, the Markov generator needs its internal data to be correctly structured. `.addData(data)` allows you add raw data, that is automatically formatted to fit the internal structure.
 
-Since `.buildCorpus()` can take some time (it loops for each word of each string), a non-blocking variant `.buildCorpusAsync()` is conveniently available if you need it.
+You can call `.addData(data)` as often as you need, **with new data each time (!)**. Multiple calls of `.addData()` with the same data is not recommended, because it will skew the random generation of results.
 
-### .generate([options])
+#### data
+
+```js
+string[] | Array<{ string: string }>
+```
+
+`data` is an array of strings (sentences), or an array of objects. If you wish to use objects, each one must have a `string` attribute. The bigger the array, the better and more various the results.
+
+Examples:
+
+```js
+[ 'lorem ipsum', 'dolor sit amet' ]
+```
+
+or
+
+```js
+[
+  { string: 'lorem ipsum', attr: 'value' },
+  { string: 'dolor sit amet', attr: 'other value' }
+]
+```
+
+The additionnal data passed with objects will be returned in the `refs` array of the generated sentence.
+
+### `.generate([options])`
 
 Returns an object of type `MarkovResult`:
 
@@ -121,7 +138,7 @@ Returns an object of type `MarkovResult`:
 }
 ```
 
-The `refs` array will contain all objects that have been used to build the sentence. May be useful to fetch some meta data or make some stats.
+The `refs` array will contain all objects that have been used to build the sentence. May be useful to fetch meta data or make stats.
 
 Since `.generate()` can potentially take several seconds or more, a non-blocking variant `.generateAsync()` is conveniently available if you need it.
 
@@ -135,7 +152,21 @@ Since `.generate()` can potentially take several seconds or more, a non-blocking
 }
 ```
 
+### `.export()` and `.import(data)`
+
+You can export and import the markov built corpus. The exported data is a serializable object, and must be deserialized before being re-imported.
+
+[Example use-case](https://github.com/scambier/markov-strings/issues/9)
+
+## Unit tests
+
+You can run tests with `npm test`, the code coverage is close to 100%.
+
 ## Changelog
+
+#### 3.0.0
+
+Refactoring to facilitate iterative construction of the corpus (multiple `.addData()` instead of a one-time `buildCorpus()`), and export/import of corpus internal data.
 
 #### 2.1.0
 
