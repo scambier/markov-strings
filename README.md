@@ -158,10 +158,6 @@ You can export and import the markov built corpus. The exported data is a serial
 
 [Example use-case](https://github.com/scambier/markov-strings/issues/9)
 
-## Unit tests
-
-You can run tests with `npm test`, the code coverage is close to 100%.
-
 ## Changelog
 
 #### 3.0.0
