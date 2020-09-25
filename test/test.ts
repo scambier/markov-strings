@@ -34,12 +34,6 @@ describe('Markov class', () => {
       expect(markov.corpus).not.toEqual({})
     })
 
-    it('should build asynchronously', async () => {
-      const markov = new Markov()
-      markov.addData = jest.fn()
-      await markov.addDataAsync(data)
-      expect(markov.addData).toHaveBeenCalled()
-    })
 
     it('should throw an error if the data structure is invalid', () => {
       const markov = new Markov()
@@ -158,12 +152,6 @@ describe('Markov class', () => {
     beforeEach(() => {
       markov = new Markov()
       markov.addData(data)
-    })
-
-    it('should generate asynchronously', async () => {
-      markov.generate = jest.fn()
-      await markov.generateAsync()
-      expect(markov.generate).toHaveBeenCalled()
     })
 
     it('should throw an error if the corpus is not built', () => {

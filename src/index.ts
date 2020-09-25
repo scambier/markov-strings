@@ -162,23 +162,7 @@ export default class Markov {
           this.corpus[curr] = [{ words: next, refs: [item] }]
         }
       }
-    })
-  }
 
-  /**
-   * `.buildCorpus()` wrapped inside a Promise
-   *
-   * @returns {Promise<void>}
-   * @memberof Markov
-   */
-  public addDataAsync(data: MarkovInputData | string[]): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        this.addData(data)
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
     })
   }
 
@@ -255,21 +239,4 @@ export default class Markov {
     throw new Error(`Failed to build a sentence after ${tries - 1} tries`)
   }
 
-  /**
-   * `.generate()` wrapped inside a Promise
-   *
-   * @param {MarkovGenerateOptions} options
-   * @returns {Promise<MarkovResult>}
-   * @memberof Markov
-   */
-  public generateAsync(options: MarkovGenerateOptions = {}): Promise<MarkovResult> {
-    return new Promise((resolve, reject) => {
-      try {
-        const result = this.generate(options)
-        resolve(result)
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
 }
