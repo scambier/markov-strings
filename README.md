@@ -29,7 +29,7 @@ This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/B
 
 ## Prerequisites
 
-This module makes use of ES6 features.
+Built and tested with NodeJS 12
 
 ## Installing
 
