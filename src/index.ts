@@ -1,4 +1,4 @@
-import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, slice, some, uniqBy } from 'lodash-es'
+import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, slice, some, uniqBy } from 'lodash'
 
 export type MarkovInputData = { string: string }[]
 

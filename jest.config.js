@@ -1,6 +1,3 @@
 module.exports = {
-  preset: 'ts-jest',
-  moduleNameMapper: {
-    '^lodash-es$': 'lodash'
-  }
+  preset: 'ts-jest'
 };
