@@ -210,7 +210,7 @@ export default class Markov {
    */
   public generate(options: MarkovGenerateOptions = {}): MarkovResult {
     if (isEmpty(this.corpus)) {
-      throw new Error('Corpus is not built')
+      throw new Error('Corpus is empty. There is either no data, or the data is not sufficient to create markov chains.')
     }
 
     const corpus = cloneDeep(this.corpus)

@@ -158,7 +158,7 @@ describe('Markov class', () => {
       markov = new Markov()
       expect(() => {
         markov.generate()
-      }).toThrowError('Corpus is not built')
+      }).toThrowError('Corpus is empty. There is either no data, or the data is not sufficient to create markov chains.')
     })
 
     it('should return a result if under the tries limit', () => {
