@@ -9,8 +9,7 @@
   "scripts": {
     "start": "tsc --watch",
     "build": "tsc",
-    "test": "jest --coverage --coverageReporters=lcov --coverageReporters=html",
-    "test:coveralls": "jest --coverageReporters=text-lcov | coveralls"
+    "test": "jest --coverage"
   },
   "engines": {
     "node": ">=8.0.0"
