@@ -1,10 +1,10 @@
 language: node_js
 
 node_js:
-  - "8"
+  - "12"
 
 install:
-  - npm install
+  - npm ci
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -16,3 +16,4 @@ script:
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  - npx jest --coverageReporters=text-lcov | coveralls

@@ -29,7 +29,7 @@ This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/B
 
 ## Prerequisites
 
-This module makes use of ES6 features.
+Built and tested with NodeJS 12
 
 ## Installing
 
@@ -157,10 +157,6 @@ Since `.generate()` can potentially take several seconds or more, a non-blocking
 You can export and import the markov built corpus. The exported data is a serializable object, and must be deserialized before being re-imported.
 
 [Example use-case](https://github.com/scambier/markov-strings/issues/9)
-
-## Unit tests
-
-You can run tests with `npm test`, the code coverage is close to 100%.
 
 ## Changelog
 
