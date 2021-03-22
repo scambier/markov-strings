@@ -140,8 +140,6 @@ Returns an object of type `MarkovResult`:
 
 The `refs` array will contain all objects that have been used to build the sentence. May be useful to fetch meta data or make stats.
 
-Since `.generate()` can potentially take several seconds or more, a non-blocking variant `.generateAsync()` is conveniently available if you need it.
-
 #### options
 
 ```ts
