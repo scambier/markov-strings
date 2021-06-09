@@ -106,7 +106,7 @@ You can call `.addData(data)` as often as you need, **with new data each time (!
 string[] | Array<{ string: string }>
 ```
 
-`data` is an array of strings (sentences), or an array of objects. If you wish to use objects, each one must have a `string` attribute. The bigger the array, the better and more various the results.
+`data` is an array of strings (sentences), or an array of objects. If you wish to use objects, each one must have a `string` attribute. The bigger the array, the better and more varied the results.
 
 Examples:
 
