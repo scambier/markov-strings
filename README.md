@@ -16,6 +16,8 @@
 A simplistic Markov chain text generator.
 Give it an array of strings, and it will output a randomly generated string.
 
+<sup><i>A rust port of this library is available [here](https://github.com/scambier/markov-strings-rust).</i></sup>
+
 This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/BelgicaNews).
 
 - [Markov-strings](#markov-strings)
