@@ -190,7 +190,7 @@ describe('Markov class', () => {
       expect.assertions(10)
 
       for (let i = 0; i < 10; i++) {
-        const result = await markov.generate()
+        const result = markov.generate()
         const arr = result.string.split(' ')
         const end = arr.slice(arr.length - 2, arr.length)
         expect(map(markov.endWords, 'words')).toContain(end.join(' '))
