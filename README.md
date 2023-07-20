@@ -42,16 +42,15 @@ Built and tested with NodeJS 12
 ## Usage
 
 ```js
-const Markov = require('markov-strings').default
-// or
 import Markov from 'markov-strings'
-
-const data = [/* insert a few hundreds/thousands sentences here */]
+// Not recommended: you can use `require()` if needed, instead of `import`
+// const Markov = require('markov-strings').default
 
 // Build the Markov generator
 const markov = new Markov({ stateSize: 2 })
 
 // Add data for the generator
+const data = [/* insert a few hundreds/thousands sentences here */]
 markov.addData(data)
 
 const options = {
