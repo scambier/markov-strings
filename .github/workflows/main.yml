@@ -12,18 +12,21 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8.6.1
 
     - uses: actions/checkout@v1
 
-    - name: Use Node.js 14.x
+    - name: Use Node.js 18.x
       uses: actions/setup-node@v1
       with:
-        node-version: 14.x
+        node-version: 18.x
 
-    - name: npm install, make test-coverage
+    - name: pnpm install, make test-coverage
       run: |
-        npm install
-        npm run test
+        pnpm install
+        pnpm run test
 
     - name: Coveralls
       uses: coverallsapp/github-action@master
