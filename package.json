@@ -29,15 +29,16 @@
   "author": "scambier",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^26.0.10",
-    "@types/lodash": "^4.14.161",
-    "@types/node": "^14.0.27",
-    "coveralls": "^3.1.0",
-    "jest": "^26.4.0",
-    "ts-jest": "^26.2.0",
-    "typescript": "^3.9.7"
+    "@types/jest": "^26.0.24",
+    "@types/lodash": "^4.14.196",
+    "@types/node": "^14.18.54",
+    "coveralls": "^3.1.1",
+    "jest": "^26.6.3",
+    "prettier": "^3.0.1",
+    "ts-jest": "^26.5.6",
+    "typescript": "^3.9.10"
   },
   "dependencies": {
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.21"
   }
 }
