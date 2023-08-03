@@ -33,7 +33,7 @@ This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/B
 
 ## Prerequisites
 
-Built and tested with NodeJS 12
+Built and tested with NodeJS 18
 
 ## Installing
 
