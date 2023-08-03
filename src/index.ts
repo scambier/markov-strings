@@ -1,10 +1,20 @@
-import { assignIn, cloneDeep, flatten, includes, isEmpty, isString, slice, some, uniqBy } from 'lodash'
+import {
+  cloneDeep,
+  flatten,
+  includes,
+  isEmpty,
+  isString,
+  slice,
+  some,
+  uniqBy,
+} from 'lodash'
+import assignIn from 'lodash/assignIn' // Workaround for weird issue with jest
 
 export type MarkovInputData = { string: string }[]
 
 export type MarkovGenerateOptions = {
-  maxTries?: number,
-  prng?: () => number,
+  maxTries?: number
+  prng?: () => number
   filter?: (result: MarkovResult) => boolean
 }
 
@@ -24,9 +34,9 @@ export type MarkovDataMembers = {
 }
 
 export type MarkovResult = {
-  string: string,
-  score: number,
-  refs: MarkovInputData,
+  string: string
+  score: number
+  refs: MarkovInputData
   tries: number
 }
 
@@ -38,13 +48,16 @@ export type MarkovFragment = {
 export type Corpus = { [key: string]: MarkovFragment[] }
 
 export type MarkovImportExport = {
-  corpus: Corpus,
-  startWords: MarkovFragment[],
-  endWords: MarkovFragment[],
+  corpus: Corpus
+  startWords: MarkovFragment[]
+  endWords: MarkovFragment[]
   options: MarkovDataMembers
 }
 
-function sampleWithPRNG<T>(array: T[], prng: () => number = Math.random): T | undefined {
+function sampleWithPRNG<T>(
+  array: T[],
+  prng: () => number = Math.random
+): T | undefined {
   const length = array == null ? 0 : array.length
   return length ? array[Math.floor(prng() * length)] : undefined
 }
@@ -58,7 +71,7 @@ export default class Markov {
   public corpus: Corpus = {}
 
   private defaultOptions: MarkovDataMembers = {
-    stateSize: 2
+    stateSize: 2,
   }
 
   /**
@@ -95,7 +108,7 @@ export default class Markov {
       options: this.options,
       corpus: this.corpus,
       startWords: this.startWords,
-      endWords: this.endWords
+      endWords: this.endWords,
     })
   }
 
@@ -103,12 +116,10 @@ export default class Markov {
     // Format data if necessary
     let input: MarkovInputData = []
     if (isString(rawData[0])) {
-      input = (rawData as string[]).map(s => ({ string: s }))
-    }
-    else if (rawData[0].hasOwnProperty('string')) {
+      input = (rawData as string[]).map((s) => ({ string: s }))
+    } else if (rawData[0].hasOwnProperty('string')) {
       input = rawData as MarkovInputData
-    }
-    else {
+    } else {
       throw new Error('Objects in your corpus must have a "string" property')
     }
 
@@ -126,7 +137,7 @@ export default class Markov {
     const options = this.options
 
     // Loop through all sentences
-    data.forEach(item => {
+    data.forEach((item) => {
       const line = item.string
       const words = line.split(' ')
       const stateSize = options.stateSize // Default value of 2 is set in the constructor
@@ -135,7 +146,7 @@ export default class Markov {
       // "Start words" is the list of words that can start a generated chain.
 
       const start = slice(words, 0, stateSize).join(' ')
-      const oldStartObj = this.startWords.find(o => o.words === start)
+      const oldStartObj = this.startWords.find((o) => o.words === start)
 
       // If we already have identical startWords
       if (oldStartObj) {
@@ -143,8 +154,7 @@ export default class Markov {
         if (!includes(oldStartObj.refs, item)) {
           oldStartObj.refs.push(item)
         }
-      }
-      else {
+      } else {
         // Add the startWords (and reference) to the list
         this.startWords.push({ words: start, refs: [item] })
       }
@@ -155,7 +165,7 @@ export default class Markov {
       // "End words" is the list of words that can end a generated chain.
 
       const end = slice(words, words.length - stateSize, words.length).join(' ')
-      const oldEndObj = this.endWords.find(o => o.words === end)
+      const oldEndObj = this.endWords.find((o) => o.words === end)
       if (oldEndObj) {
         if (!includes(oldEndObj.refs, item)) {
           oldEndObj.refs.push(item)
@@ -180,7 +190,7 @@ export default class Markov {
 
         // Check if the corpus already has a corresponding "curr" block
         if (this.corpus.hasOwnProperty(curr)) {
-          const oldObj = this.corpus[curr].find(o => o.words === next)
+          const oldObj = this.corpus[curr].find((o) => o.words === next)
           if (oldObj) {
             // If the corpus already has the chain "curr -> next",
             // just add the current reference for this block
@@ -189,8 +199,7 @@ export default class Markov {
             // Add the new "next" block in the list of possible paths for "curr"
             this.corpus[curr].push({ words: next, refs: [item] })
           }
-        }
-        else {
+        } else {
           // Add the "curr" block and link it with the "next" one
           this.corpus[curr] = [{ words: next, refs: [item] }]
         }
@@ -199,7 +208,6 @@ export default class Markov {
       //#endregion Corpus generation
     })
   }
-
 
   /**
    * Generates a result, that contains a string and its references
@@ -210,7 +218,9 @@ export default class Markov {
    */
   public generate(options: MarkovGenerateOptions = {}): MarkovResult {
     if (isEmpty(this.corpus)) {
-      throw new Error('Corpus is empty. There is either no data, or the data is not sufficient to create markov chains.')
+      throw new Error(
+        'Corpus is empty. There is either no data, or the data is not sufficient to create markov chains.'
+      )
     }
 
     const corpus = cloneDeep(this.corpus)
@@ -253,25 +263,31 @@ export default class Markov {
       }
 
       const sentence = arr
-        .map(o => o.words)
+        .map((o) => o.words)
         .join(' ')
         .trim()
 
       const result = {
         string: sentence,
         score,
-        refs: uniqBy(flatten(arr.map(o => o.refs)), 'string'),
-        tries
+        refs: uniqBy(flatten(arr.map((o) => o.refs)), 'string'),
+        tries,
       }
 
       // sentence is not ended or incorrect
-      if (!ended || (typeof options.filter === 'function' && !options.filter(result))) {
+      if (
+        !ended ||
+        (typeof options.filter === 'function' && !options.filter(result))
+      ) {
         continue
       }
 
       return result
     }
-    throw new Error(`Failed to build a sentence after ${tries - 1} tries. Possible solutions: try a less restrictive filter(), give more raw data to the corpus builder, or increase the number of maximum tries.`)
+    throw new Error(
+      `Failed to build a sentence after ${
+        tries - 1
+      } tries. Possible solutions: try a less restrictive filter(), give more raw data to the corpus builder, or increase the number of maximum tries.`
+    )
   }
-
 }
