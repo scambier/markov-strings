@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.org/scambier/markov-strings.svg?branch=master)](https://travis-ci.org/scambier/markov-strings)
 [![Coverage Status](https://coveralls.io/repos/github/scambier/markov-strings/badge.svg?branch=master)](https://coveralls.io/github/scambier/markov-strings?branch=master)
 [![npm version](https://badge.fury.io/js/markov-strings.svg)](https://badge.fury.io/js/markov-strings)
-![Maintenance](https://img.shields.io/maintenance/yes/2023)
 
 
 ---
@@ -16,7 +15,7 @@ Give it an array of strings, and it will output a randomly generated string.
 
 <sup><i>A rust port of this library is available [here](https://github.com/scambier/markov-strings-rust).</i></sup>
 
-This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/BelgicaNews).
+This module was created for the Mastodon bot [@BelgicaNews](https://botsin.space/@BelgicaNews).
 
 - [Markov-strings](#markov-strings)
   - [Prerequisites](#prerequisites)
@@ -33,7 +32,7 @@ This module was created for the Twitter bot [@BelgicaNews](https://twitter.com/B
 
 ## Prerequisites
 
-Built and tested with NodeJS 12
+Built and tested with NodeJS 18
 
 ## Installing
 
