@@ -6,9 +6,9 @@ import {
   isString,
   slice,
   some,
-  uniqBy,
-} from 'lodash'
-import assignIn from 'lodash/assignIn' // Workaround for weird issue with jest
+  uniqBy, 
+  assignIn
+} from 'lodash-es'
 
 export type MarkovInputData = { string: string }[]
 
@@ -285,8 +285,7 @@ export default class Markov {
       return result
     }
     throw new Error(
-      `Failed to build a sentence after ${
-        tries - 1
+      `Failed to build a sentence after ${tries - 1
       } tries. Possible solutions: try a less restrictive filter(), give more raw data to the corpus builder, or increase the number of maximum tries.`
     )
   }
