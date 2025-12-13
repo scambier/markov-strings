@@ -29,14 +29,14 @@
   "author": "scambier",
   "license": "MIT",
   "devDependencies": {
-    "@types/lodash": "^4.17.13",
+    "@types/lodash": "^4.17.21",
     "@types/lodash-es": "^4.17.12",
-    "@types/node": "^22.10.4",
+    "@types/node": "^22.19.2",
     "@vitest/coverage-v8": "2.1.8",
-    "coveralls": "^3.1.1",
-    "prettier": "^3.4.2",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "coveralls-next": "^6.0.1",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
   },
   "dependencies": {
     "lodash-es": "^4.17.21"
