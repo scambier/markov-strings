@@ -15,7 +15,7 @@ importers:
     dependencies:
       lodash-es:
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.23
     devDependencies:
       '@types/lodash':
         specifier: ^4.17.21
@@ -557,8 +557,8 @@ packages:
     resolution: {integrity: sha512-aprLII/vPzuQvYZnDRU78Fns9I2Ag3gi4Ipga/hxnVMCZC8DnR2nI7XBqrPoywGfxqIx/DgarGvDJZAD3YBTgQ==}
     hasBin: true
 
-  lodash-es@4.17.21:
-    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+  lodash-es@4.17.23:
+    resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
 
   loupe@3.2.1:
     resolution: {integrity: sha512-CdzqowRJCeLU72bHvWqwRBBlLcMEtIvGrlvef74kMnV2AolS9Y8xUv1I0U/MNAWMhBlKIoyuEgoJ0t/bbwHbLQ==}
@@ -1206,7 +1206,7 @@ snapshots:
 
   lcov-parse@1.0.0: {}
 
-  lodash-es@4.17.21: {}
+  lodash-es@4.17.23: {}
 
   loupe@3.2.1: {}
 
