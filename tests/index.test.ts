@@ -1,6 +1,6 @@
-import { map, some } from 'lodash-es'
+import { some, map } from 'es-toolkit/compat'
 import Markov, { MarkovResult } from '../src'
-import { describe, expect,  it, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const data = [
   'Lorem ipsum dolor sit amet',
@@ -10,12 +10,11 @@ const data = [
   'Justo nisi fringilla dui',
   'Egestas bibendum eros nisi ut lacus',
   "fringilla dui avait annoncé une rupture avec le erat vel: il n'en est rien…",
-  'Fusce tincidunt tempor, erat vel lacinia vel ex pharetra pretium lacinia imperdiet'
+  'Fusce tincidunt tempor, erat vel lacinia vel ex pharetra pretium lacinia imperdiet',
 ]
 
 describe('Markov class', () => {
   describe('Constructor', () => {
-
     it('should have a default stateSize', () => {
       const markov = new Markov()
       expect(markov.options.stateSize).toBe(2)
@@ -35,7 +34,6 @@ describe('Markov class', () => {
       expect(markov.corpus).not.toEqual({})
     })
 
-
     it('should throw an error if the data structure is invalid', () => {
       const markov = new Markov()
       expect(() => {
@@ -46,10 +44,9 @@ describe('Markov class', () => {
 
     it('should accept objects', () => {
       const markov = new Markov()
-      markov.addData(data.map(o => ({ string: o })))
+      markov.addData(data.map((o) => ({ string: o })))
       expect(markov.corpus).not.toEqual({})
     })
-
   })
 
   describe('After adding data', () => {
@@ -159,7 +156,9 @@ describe('Markov class', () => {
       markov = new Markov()
       expect(() => {
         markov.generate()
-      }).toThrowError('Corpus is empty. There is either no data, or the data is not sufficient to create markov chains.')
+      }).toThrowError(
+        'Corpus is empty. There is either no data, or the data is not sufficient to create markov chains.'
+      )
     })
 
     it('should return a result if under the tries limit', () => {
@@ -172,7 +171,7 @@ describe('Markov class', () => {
     })
 
     it('should call the `filter` callback', () => {
-      const filter = vi.fn(x => true)
+      const filter = vi.fn((x) => true)
       markov.generate({ filter })
       expect(filter).toHaveBeenCalled()
     })
@@ -182,7 +181,7 @@ describe('Markov class', () => {
         markov.generate({
           filter(result: MarkovResult): boolean {
             return false
-          }
+          },
         })
       }).toThrowError('10')
     })
@@ -212,10 +211,9 @@ describe('Markov class', () => {
           expect(Array.isArray(result.refs)).toBeTruthy()
           expect(result).toHaveProperty('tries')
           return true
-        }
+        },
       }
       markov.generate(options)
     })
-
   })
 })
