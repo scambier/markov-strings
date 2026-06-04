@@ -1,14 +1,4 @@
-import {
-  cloneDeep,
-  flatten,
-  includes,
-  isEmpty,
-  isString,
-  slice,
-  some,
-  uniqBy,
-  assignIn,
-} from 'es-toolkit/compat'
+import { cloneDeep, flatten, isEmptyObject, isString, uniqBy } from 'es-toolkit'
 
 export type MarkovInputData = { string: string }[]
 
@@ -85,7 +75,7 @@ export default class Markov {
 
     // Save options
     this.options = this.defaultOptions
-    assignIn(this.options, options)
+    Object.assign(this.options, options)
   }
 
   /**
@@ -145,13 +135,13 @@ export default class Markov {
       //#region Start words
       // "Start words" is the list of words that can start a generated chain.
 
-      const start = slice(words, 0, stateSize).join(' ')
+      const start = words.slice(0, stateSize).join(' ')
       const oldStartObj = this.startWords.find((o) => o.words === start)
 
       // If we already have identical startWords
       if (oldStartObj) {
         // If the current item is not present in the references, add it
-        if (!includes(oldStartObj.refs, item)) {
+        if (!oldStartObj.refs.includes(item)) {
           oldStartObj.refs.push(item)
         }
       } else {
@@ -164,10 +154,10 @@ export default class Markov {
       //#region End words
       // "End words" is the list of words that can end a generated chain.
 
-      const end = slice(words, words.length - stateSize, words.length).join(' ')
+      const end = words.slice(words.length - stateSize, words.length).join(' ')
       const oldEndObj = this.endWords.find((o) => o.words === end)
       if (oldEndObj) {
-        if (!includes(oldEndObj.refs, item)) {
+        if (!oldEndObj.refs.includes(item)) {
           oldEndObj.refs.push(item)
         }
       } else {
@@ -182,8 +172,8 @@ export default class Markov {
       // e.g. for a stateSize of 2, "lorem ipsum dolor sit amet" will have the following blocks:
       //    "lorem ipsum", "ipsum dolor", "dolor sit", and "sit amet"
       for (let i = 0; i < words.length - 1; i++) {
-        const curr = slice(words, i, i + stateSize).join(' ')
-        const next = slice(words, i + stateSize, i + stateSize * 2).join(' ')
+        const curr = words.slice(i, i + stateSize).join(' ')
+        const next = words.slice(i + stateSize, i + stateSize * 2).join(' ')
         if (!next || next.split(' ').length !== options.stateSize) {
           continue
         }
@@ -217,7 +207,7 @@ export default class Markov {
    * @memberof Markov
    */
   public generate(options: MarkovGenerateOptions = {}): MarkovResult {
-    if (isEmpty(this.corpus)) {
+    if (isEmptyObject(this.corpus)) {
       throw new Error(
         'Corpus is empty. There is either no data, or the data is not sufficient to create markov chains.'
       )
@@ -256,7 +246,7 @@ export default class Markov {
         score += corpus[block.words].length - 1 // increment score
 
         // is sentence finished?
-        if (some(this.endWords, { words: state.words })) {
+        if (this.endWords.some((x) => x.words === state.words)) {
           ended = true
           break
         }
@@ -270,7 +260,7 @@ export default class Markov {
       const result = {
         string: sentence,
         score,
-        refs: uniqBy(flatten(arr.map((o) => o.refs)), 'string'),
+        refs: uniqBy(flatten(arr.map((o) => o.refs)), (x) => x.string),
         tries,
       }
 
