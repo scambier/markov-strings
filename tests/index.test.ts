@@ -1,4 +1,3 @@
-import { some, map } from 'es-toolkit/compat'
 import Markov, { MarkovResult } from '../src'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -59,13 +58,15 @@ describe('Markov class', () => {
     describe('The startWords array', () => {
       it('should contain the right values', () => {
         const start = markov.startWords
-        expect(some(start, { words: 'Lorem ipsum' })).toBeTruthy()
-        expect(some(start, { words: 'Consectetur adipiscing' })).toBeTruthy()
-        expect(some(start, { words: 'Quisque tempor,' })).toBeTruthy()
-        expect(some(start, { words: 'Justo nisi' })).toBeTruthy()
-        expect(some(start, { words: 'Egestas bibendum' })).toBeTruthy()
-        expect(some(start, { words: 'fringilla dui' })).toBeTruthy()
-        expect(some(start, { words: 'Fusce tincidunt' })).toBeTruthy()
+        expect(start.some((x) => x.words === 'Lorem ipsum')).toBeTruthy()
+        expect(
+          start.some((x) => x.words === 'Consectetur adipiscing')
+        ).toBeTruthy()
+        expect(start.some((x) => x.words === 'Quisque tempor,')).toBeTruthy()
+        expect(start.some((x) => x.words === 'Justo nisi')).toBeTruthy()
+        expect(start.some((x) => x.words === 'Egestas bibendum')).toBeTruthy()
+        expect(start.some((x) => x.words === 'fringilla dui')).toBeTruthy()
+        expect(start.some((x) => x.words === 'Fusce tincidunt')).toBeTruthy()
       })
 
       it('should have the right length', () => {
@@ -80,24 +81,27 @@ describe('Markov class', () => {
 
       it('should contain the right values', () => {
         const end = markov.endWords
-        expect(some(end, { words: 'sit amet' })).toBeTruthy()
-        expect(some(end, { words: 'start words' })).toBeTruthy()
-        expect(some(end, { words: 'adipiscing elit' })).toBeTruthy()
-        expect(some(end, { words: 'fringilla dui' })).toBeTruthy()
-        expect(some(end, { words: 'ut lacus' })).toBeTruthy()
-        expect(some(end, { words: 'est rien…' })).toBeTruthy()
+
+        expect(end.some((x) => x.words === 'sit amet')).toBeTruthy()
+        expect(end.some((x) => x.words === 'start words')).toBeTruthy()
+        expect(end.some((x) => x.words === 'adipiscing elit')).toBeTruthy()
+        expect(end.some((x) => x.words === 'fringilla dui')).toBeTruthy()
+        expect(end.some((x) => x.words === 'ut lacus')).toBeTruthy()
+        expect(end.some((x) => x.words === 'est rien…')).toBeTruthy()
       })
     })
 
     describe('The corpus itself', () => {
       it('should have the right values for the right keys', () => {
         const corpus = markov.corpus
-        expect(some(corpus['Lorem ipsum'], { words: 'dolor sit' })).toBeTruthy()
         expect(
-          some(corpus['Lorem ipsum'], { words: 'duplicate start' })
+          corpus['Lorem ipsum'].some((x) => x.words === 'dolor sit')
         ).toBeTruthy()
         expect(
-          some(corpus['tempor, erat'], { words: 'vel lacinia' })
+          corpus['Lorem ipsum'].some((x) => x.words === 'duplicate start')
+        ).toBeTruthy()
+        expect(
+          corpus['tempor, erat'].some((x) => x.words === 'vel lacinia')
         ).toBeTruthy()
       })
     })
@@ -193,7 +197,7 @@ describe('Markov class', () => {
         const result = markov.generate()
         const arr = result.string.split(' ')
         const end = arr.slice(arr.length - 2, arr.length)
-        expect(map(markov.endWords, 'words')).toContain(end.join(' '))
+        expect(markov.endWords.map((x) => x.words)).toContain(end.join(' '))
       }
     })
 
